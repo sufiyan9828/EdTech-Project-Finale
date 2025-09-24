@@ -1,0 +1,14 @@
+{# templates/courses/add_lesson.html #}
+{% extends "base.html" %}
+{% block main %}
+<div class="container py-4">
+  <h2 class="mb-3">Add Lesson for "{{ module.title|default:'Untitled module' }}"</h2>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Add Lesson</button>
+    <a href="{% url 'module_content' module.course.id %}" class="btn btn-secondary">Back</a>
+  </form>
+</div>
+{% endblock %}        

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container mt-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h2>Enrollments for "{{ course.title }}"</h2>
+    </div>
+    <div class="card-body">
+      {% if enrollments %}
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>Enrollment Date</th>
+                <th>Status</th> 
+              </tr>
+            </thead>
+            <tbody>
+              {% for enrollment in enrollments %}
+              <tr>
+                <td>{{ enrollment.student.username }}</td>
+                <td>{{ enrollment.enrollment_date|date:"M d, Y" }}</td>
+                <td>
+                  {% if enrollment.status == 'enrolled' %} 
+                    <span class="badge bg-success">Enrolled</span>
+                  {% else %}
+                    <span class="badge bg-warning">Pending</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="text-center">No enrollments yet.</p>
+      {% endif %}
+      <a href="{% url 'my_courses' %}" class="btn btn-secondary">Back to My Courses</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

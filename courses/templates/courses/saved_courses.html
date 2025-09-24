@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block main %}
+
+<div class="container mt-4">
+    <h1 class="mb-4">My Saved Courses</h1>
+    <div class="row">
+        {% for saved_course in saved_courses %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ saved_course.course.title }}</h5>
+                    <p class="card-text">{{ saved_course.course.description|truncatewords:20 }}</p>
+                    <p class="text-muted">By {{ saved_course.course.instructor.username }}</p>
+                    <span class="badge bg-primary">{{ saved_course.course.course_type }}</span>
+                    <span class="float-end">₹{{ saved_course.course.price }}</span> {# Changed to Rupees #}
+                </div>
+                <div class="card-footer bg-white">
+                    <a href="{% url 'course_detail' saved_course.course.id %}" class="btn btn-sm btn-primary">View Details</a>
+                    <form action="{% url 'toggle_save_course' saved_course.course.id %}" method="POST" class="d-inline ms-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-warning">Unsave</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                You haven't saved any courses yet.
+                <a href="{% url 'course_list' %}" class="alert-link">Browse available courses.</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock main %}
+

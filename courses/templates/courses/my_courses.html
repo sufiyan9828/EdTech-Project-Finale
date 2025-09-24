@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>My Posted Courses</h1> 
+        <a href="{% url 'course_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Post New Course
+        </a>
+    </div>
+
+    <div class="list-group">
+        {% for course in courses %}
+        <a href="{% url 'course_detail' course.id %}" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ course.title }}</h5>
+                <small>{{ course.posted_on|date:"M d, Y" }}</small> 
+            </div>
+            <p class="mb-1">{{ course.description|truncatewords:20 }}</p>
+            <small class="text-muted">
+                {% if course.enrollment_count %}
+                    {{ course.enrollment_count }} enrollments 
+                {% else %}
+                    No enrollments yet
+                {% endif %}
+            </small>
+            <a href="{% url 'view_enrollments' course.id %}" class="btn btn-sm btn-info float-end">Manage Enrollments</a>
+        </a>
+        {% empty %}
+        <div class="alert alert-info">
+            You haven't posted any courses yet.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

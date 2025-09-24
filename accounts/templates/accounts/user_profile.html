@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">User Profile: {{ user_obj.username }}</h2>
+        </div>
+        <div class="card-body">
+            
+            <div class="row mb-4 align-items-center">
+                <div class="col-md-3 text-center">
+                    <img src="{{ user_obj.get_profile_photo_url }}" class="rounded-circle border border-primary p-1" width="150" height="150" alt="Profile Photo" style="object-fit: cover;">
+                </div>
+                <div class="col-md-9">
+                    <h4 class="mb-1">{{ user_obj.name }}</h4>
+                    <p class="text-muted mb-2">@{{ user_obj.username }}</p>
+                    <p class="mb-1"><strong>Email:</strong> {{ user_obj.email }}</p>
+                    <p class="mb-1"><strong>Contact:</strong> {{ user_obj.contact }}</p>
+                    <p class="mb-1"><strong>User Type:</strong> 
+                        {% if user_obj.user_type == 'S' %}Student
+                        {% elif user_obj.user_type == 'I' %}Instructor
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+           
+            {% if user_obj.user_type == 'S' and profile %}
+            <div class="border-top pt-3 mt-4">
+                <h5 class="mb-3">Student Details</h5>
+                <p class="mb-1"><strong>Education:</strong> {{ profile.educations|default:"Not specified" }}</p>
+                <p class="mb-1"><strong>Institution Name:</strong> {{ profile.institution_name|default:"Not specified" }}</p>
+                <p class="mb-1"><strong>Current Year:</strong> {{ profile.current_year|default:"Not specified" }}</p>
+                <p class="mb-1"><strong>Student ID:</strong> {{ profile.student_id|default:"Not specified" }}</p>
+            </div>
+            {% elif user_obj.user_type == 'I' and profile %}
+            <div class="border-top pt-3 mt-4">
+                <h5 class="mb-3">Instructor Details</h5>
+                <p class="mb-1"><strong>Organization:</strong> {{ profile.organization_name|default:"Not specified" }}</p>
+                <p class="mb-1"><strong>Contact:</strong> {{ profile.contact|default:"Not specified" }}</p>
+            </div>
+            {% endif %}
+
+            <div class="border-top pt-3 mt-4">
+                <h5 class="mb-3">
+                    {% if user_obj.user_type == 'I' %}Courses Taught
+                    {% elif user_obj.user_type == 'S' %}Courses Enrolled
+                    {% endif %}
+                </h5>
+                {% if user_courses %}
+                    <div class="list-group">
+                    {% for item in user_courses %}
+                        {% if user_obj.user_type == 'I' %}
+                        <a href="{% url 'course_detail' item.id %}" class="list-group-item list-group-item-action">
+                            {{ item.title }}
+                        </a>
+                        {% elif user_obj.user_type == 'S' %}
+                        <a href="{% url 'course_detail' item.course.id %}" class="list-group-item list-group-item-action">
+                            {{ item.course.title }} (by {{ item.course.instructor.username }})
+                        </a>
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No courses found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

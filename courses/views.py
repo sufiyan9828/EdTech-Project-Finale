@@ -80,8 +80,13 @@ def enrollment_details(request, enrollment_id):
 
 
 def course_list(request):
-    courses = Course.objects.all()
-    return render(request, 'courses/course_list.html', {'courses': courses})
+    courses = Course.objects.all().filter(end_date__gte=timezone.now().date())
+    enrollment = Enrollment.objects.all().filter(status= 'enrolled')
+    context = {
+        'courses': courses,
+        'enrollment': enrollment
+    }
+    return render(request, 'courses/course_list.html', context)
 
 @login_required
 def course_detail(request, course_id):

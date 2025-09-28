@@ -1,4 +1,3 @@
-{# templates/courses/module_content.html #}
 {% extends 'base.html' %}
 {% block main %}
 <div class="container py-5">
@@ -7,7 +6,9 @@
       <div class="d-flex justify-content-between shadow-sm mb-2">
         <h2 class="fw-semibold ms-3">Modules for {{ course.title }}</h2>
         {% if user.is_authenticated and user.user_type == 'I' %}
+        {% if request.user == course.instructor %}
         <a href="{% url 'add_module' course.id %}" class="btn btn-success mb-3">Add Module</a>
+        {% endif %}
         {% endif %}
       </div>
 
@@ -17,11 +18,13 @@
             <div class="d-flex justify-content-between">
               <div>
                 <h4 class="mb-1">{{ module.title|default:"(Untitled module)" }}</h4>
-                <p class="text-muted">{{ module.description|default:"No description." }}</p>
+                <p class="text-muted">{{ module.description|truncatechars:120|default:"No description." }}</p>
               </div>
               <div>
                 {% if user.is_authenticated and user.user_type == 'I' %}
+                {% if request.user == course.instructor %}
                 <a href="{% url 'add_lesson' module.id %}" class="btn btn-primary">Add Lesson</a>
+                {% endif %}
                 {% endif %}
               </div>
             </div>

@@ -4,10 +4,8 @@
   <h1 class="mb-4">Available Courses</h1>
   <div class="row">
     {% for course in courses %}
-    {% if course_status != 'ended'%}
     <div class="col-md-4 mb-4">
       <div class="card h-100">
-        {# Display image above the course title #}
         {% if course.image %}
         <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}">
         {% else %}
@@ -18,31 +16,30 @@
           <p class="card-text">{{ course.description|truncatewords:20 }}</p>
           <p class="text-muted">By {{ course.instructor.username }}</p>
           <span class="badge bg-primary">{{ course.course_type }}</span>
-          <span class="float-end">₹{{ course.price }}</span> {# Changed to Rupees #}
+          <span class="float-end">₹{{ course.price }}</span>
         </div>
         <div class="card-footer">
           <a href="{% url 'course_detail' course.id %}" class="btn btn-sm btn-primary">View Details</a>
-          {% if course_status == 'not_started' %}
-          <a href="{% url 'course_detail' course.id %}" class="btn btn-sm btn-success float-end">This Course Not
-            Started yet.</a>
-            {% else %}
-              {% if enrollment_status == 'enrolled' %}
-                {% if course_completed %}
-          <button type="button" class="btn btn-sm btn-success float-end ms-2">Course Completed</button>
-                {% else %}
+          {% if user.is_authenticated %}
+          {% if request.user.type == 'S' %}
+          {% if request.user == course.enrollment %}
           <a href="{% url 'module_content' course.id %}" class="btn btn-sm btn-success float-end">View Course
             Content</a>
-                {% endif %}
-              {% elif enrollment_status == 'pending' %}
-          <button class="btn btn-warning">Enrollment Pending</button>
-              {% else %}
-          <a href="{% url 'course_detail' course.id %}" class="btn btn-sm btn-success float-end">Enroll Now</a>
-              {% endif %}
+          {% else %}
+          <a href="{% url 'enroll_course' course.id %}" class="btn btn-sm btn-success float-end">Enroll Now</a>
+          {% endif %}
+          {% endif %}
+          {% if request.user.type == 'I' %}
+          <a href="{% url 'module_content' course.id %}" class="btn btn-sm btn-success float-end">Check Modules</a>
+          {% else %}
+          <a href="{% url 'module_content' course.id %}" class="btn btn-sm btn-success float-end">View Course</a>
+          {% endif %}
+          {% else %}
+          <a href="{% url 'login' %}" class="btn btn-sm btn-success float-end">Enroll Now</a>
           {% endif %}
         </div>
       </div>
     </div>
-    {% endif %}
     {% empty %}
     <div class="col-12">
       <p class="alert alert-info">No courses available.</p>

@@ -53,10 +53,12 @@
         <a href="{% url 'course_detail' course.id %}" class="btn btn-primary">This Course has Ended</a>
         {% elif course_status == 'not_started' %}
         <a href="{% url 'course_detail' course.id %}" class="btn btn-primary">This Course Not Started</a>
-        {% else %}
+        {% elif request.user == course.instructor  %}
         <a href="{% url 'module_content' course.id %}" class="btn btn-success">Check Modules</a>
+        {% else %}
+        <a href="{% url 'module_content' course.id %}" class="btn btn-success">View Course</a>
         {% endif %}
-
+        
         {% else %}
         {% endif %} 
 

@@ -2,7 +2,7 @@
 {% block main %}
 <div class="container my-5">
     <!-- Hero Section -->
-    <div class="hero-section bg-primary text-white p-5 rounded-3 shadow mb-5 text-center">
+    <div class="hero-section bg-primary text-white p-5 rounded-3 shadow-lg mb-5 text-center">
         <h1 class="fw-bold">Welcome back, {{ user.username }}!</h1>
         <p class="lead mb-3">
             Ready to continue learning? Explore our latest courses and grow your skills.
@@ -19,8 +19,8 @@
     <!-- Quick Actions Section -->
     <div class="row text-center justify-content-center mb-5">
         <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
+            <div class="card">
+                <div class="card-body shadow-lg border-0 h-100">
                     <h5 class="card-title">Available Courses</h5>
                     <p class="card-text">Discover a wide range of courses designed to boost your knowledge.</p>
                     <a href="{% url 'course_list' %}" class="btn btn-primary">Explore</a>
@@ -30,8 +30,8 @@
 
         {% if user.user_type == 'S' %}
         <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
+            <div class="card">
+                <div class="card-body shadow-lg border-0 h-100">
                     <h5 class="card-title">My Enrolled Courses</h5>
                     <p class="card-text">See the courses you have enrolled in and track your progress.</p>
                     <a href="{% url 'my_enrolled_courses' %}" class="btn btn-success">View</a>
@@ -42,8 +42,8 @@
 
         {% if user.user_type == 'I' %}
         <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
+            <div class="card">
+                <div class="card-body shadow-lg border-0 h-100">
                     <h5 class="card-title">Create New Course</h5>
                     <p class="card-text">Add new lessons and help students learn effectively.</p>
                     <a href="{% url 'my_courses' %}" class="btn btn-success">Create</a>
@@ -53,8 +53,8 @@
         {% endif %}
 
         <div class="col-md-3 mb-3">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
+            <div class="card">
+                <div class="card-body shadow-lg border-0 h-100">
                     <h5 class="card-title">About Us</h5>
                     <p class="card-text">Learn more about our mission and why we built this platform.</p>
                     <a href="{% url 'about_us' %}" class="btn btn-info text-white">Know More</a>

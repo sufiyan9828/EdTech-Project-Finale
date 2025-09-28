@@ -7,9 +7,13 @@ class CoursePostingForm(forms.ModelForm):
         model = Course
         fields = ['title', 'description', 'category', 'price', 'start_date', 'end_date','image']
         widgets = {
-            'start_date': forms.DateInput(attrs={'type': 'date'}),
-            'end_date': forms.DateInput(attrs={'type': 'date'}),
-            'image': forms.FileInput(attrs={'accept': 'image/*'}),
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
+            'category': forms.TextInput(attrs={'class': 'form-control'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control'}),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'image': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
         }
 
 class EnrollmentForm(ModelForm):
@@ -20,9 +24,21 @@ class EnrollmentForm(ModelForm):
 class ModuleForm(ModelForm):
     class Meta:
         model = Module
-        fields = ['title','description']
+        fields = ['title', 'description']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
 
 class LessonForm(ModelForm):
     class Meta:
         model = Lesson
-        fields = ['title','content','content_type','video_url','assessment_url','document']
+        fields = ['title', 'content', 'content_type', 'video_url', 'assessment_url', 'document']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'content_type': forms.Select(attrs={'class': 'form-control'}),
+            'video_url': forms.URLInput(attrs={'class': 'form-control'}),
+            'assessment_url': forms.URLInput(attrs={'class': 'form-control'}),
+            'document': forms.FileInput(attrs={'class': 'form-control'}),
+        }

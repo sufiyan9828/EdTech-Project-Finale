@@ -5,6 +5,10 @@ from django.utils import timezone
 from .models import Course, Enrollment, SavedCourse,Module,Lesson,LessonComplete,CourseCompletion
 from .forms import CoursePostingForm,ModuleForm,LessonForm
 from django.db.models import Count,Q
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from io import BytesIO
+from xhtml2pdf import pisa
 
 
 def is_instructor(user):
@@ -346,3 +350,35 @@ def edit_lesson(request, lesson_id):
         'lesson': lesson,
     }
     return render(request, 'courses/edit_lesson.html', context)
+
+@login_required
+def generate_certificate(request, course_id):
+    if not is_student(request.user):
+        messages.error(request, "Only students can generate certificates.")
+        return redirect('home')
+
+    course = get_object_or_404(Course, id=course_id)
+    student = request.user
+
+    course_completion = CourseCompletion.objects.filter(student=student, course=course).first()
+    if not course_completion:
+        messages.error(request, "You have not completed this course yet.")
+        return redirect('course_detail', course_id=course.id)
+
+    context = {
+        'student_name': student.get_full_name() or student.username,
+        'course_title': course.title,
+        'completion_date': course_completion.completed_on.strftime("%B %d, %Y"),
+    }
+
+    html_string = render_to_string('courses/certificate_template.html', context)
+
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html_string.encode("UTF-8")), result)
+    if pdf.err:
+        messages.error(request, "Error generating PDF")
+        return redirect('course_detail', course_id=course.id)
+
+    response = HttpResponse(result.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="certificate_{student.username}_{course.id}.pdf"'
+    return response

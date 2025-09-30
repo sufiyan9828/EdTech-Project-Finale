@@ -38,6 +38,8 @@
           {% if enrollment_status == 'enrolled' %}
           {% if course_completed %}
           <a href="{% url 'module_content' course.id %}" class="btn btn-success ms-2">Course Completed</a>
+                  <a href="{% url 'generate_certificate' course.id %}" class="btn btn-info ms-2">Download Certificate</a>
+
           {% else %}
           <a href="{% url 'module_content' course.id %}" class="btn btn-success">View Course Content</a>
           {% endif %}

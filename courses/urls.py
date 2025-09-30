@@ -18,5 +18,6 @@ urlpatterns = [
     path('edit-module/<int:module_id>/', views.edit_module, name='edit_module'),
     path('edit-lesson/<int:lesson_id>/', views.edit_lesson, name='edit_lesson'),
     path("course/<int:course_id>/complete/", views.mark_course_completed, name="mark_course_completed"),
+    path('course/<int:course_id>/certificate/', views.generate_certificate, name='generate_certificate'),
     path('<int:course_id>/', views.course_detail, name='course_detail'),
 ]

@@ -1,0 +1,147 @@
+{% load static %}
+
+{% block main %}
+<style>
+    /* General body styling for display in browser */
+    /* These styles might be overridden by base.html body styles,
+       but are good for direct PDF rendering context. */
+    body {
+        background-color: #f0f2f5; /* Light grey background */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* Ensure it takes full viewport height */
+        margin: 0;
+        padding: 20px; /* Some padding around the certificate */
+        box-sizing: border-box;
+    }
+
+    /* Styles specifically for PDF generation */
+    @page {
+        size: A4 landscape;
+        margin: 0;
+    }
+    .certificate-container {
+        width: 29.7cm; /* A4 landscape width */
+        height: 21cm; /* A4 landscape height */
+        background-color: #ffffff;
+        border: 10px solid #007bff; /* Primary blue border */
+        box-sizing: border-box;
+        padding: 50px 80px; /* Increased padding */
+        text-align: center;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; /* Distribute content vertically */
+        align-items: center;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .certificate-header {
+        width: 100%;
+        margin-bottom: 30px;
+    }
+
+    .logo {
+        width: 150px; /* Slightly larger logo */
+        height: auto;
+        margin-bottom: 20px;
+    }
+
+    h1 {
+        font-size: 3.8em; /* Larger main title */
+        color: #007bff;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 4px; /* More prominent letter spacing */
+        font-weight: 700; /* Bolder */
+    }
+
+    .subtitle {
+        font-size: 1.4em;
+        color: #555;
+        margin-top: 15px;
+        margin-bottom: 10px;
+    }
+
+    .student-name {
+        font-size: 3.2em; /* Larger student name */
+        font-weight: 800; /* Extra bold */
+        color: #222;
+        margin: 10px 0;
+        text-transform: capitalize;
+        border-bottom: 4px solid #007bff; /* Thicker, primary color underline */
+        display: inline-block;
+        padding-bottom: 8px;
+        line-height: 1.2;
+    }
+
+    .course-title {
+        font-size: 2.2em; /* Larger course title */
+        font-weight: 600; /* Semi-bold */
+        color: #333;
+        margin-top: 30px;
+        margin-bottom: 20px;
+        padding: 0 20px; /* Add horizontal padding */
+    }
+
+    .certificate-footer {
+        width: 100%;
+        margin-top: 40px;
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-end;
+    }
+
+    .completion-date {
+        font-size: 1.4em;
+        color: #666;
+        font-weight: 500;
+        text-align: left;
+        flex-basis: 40%; /* Adjust width */
+    }
+
+    .signature-block {
+        flex-basis: 40%; /* Adjust width */
+        text-align: right;
+    }
+
+    .signature-line {
+        border-top: 2px solid #333;
+        width: 70%;
+        margin-left: auto;
+        margin-bottom: 5px;
+    }
+
+    .signature-text {
+        font-size: 1.1em;
+        color: #333;
+        font-weight: 600;
+    }
+</style>
+
+<div class="certificate-container">
+    <div class="certificate-header">
+        <img src="{% static 'images/brightlearn_logo.png' %}" alt="BrightLearn Logo" class="logo" />
+        <h1 class="mt-5">Certificate of Completion</h1>
+    </div>
+
+    <div class="certificate-body">
+        <p class="subtitle">This certifies that</p>
+        <h2 class="student-name">{{ student_name }}</h2>
+        <p class="subtitle">has successfully completed the course</p>
+        <h3 class="course-title">{{ course_title }}</h3>
+    </div>
+
+    <div class="certificate-footer">
+        <div class="completion-date">
+            Date: {{ completion_date }}
+        </div>
+        <div class="signature-block">
+            <div class="signature-line"></div>
+            <p class="signature-text">Instructor / BrightLearn Team</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

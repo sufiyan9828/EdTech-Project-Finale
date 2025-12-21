@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container py-5">
+  <div class="card text-start">
+    <div class="card-body">
+      <div class="d-flex justify-content-between shadow-sm mb-2">
+        <h2 class="fw-semibold ms-3">Modules for {{ course.title }}</h2>
+        {% if user.is_authenticated and user.user_type == 'I' %}
+        {% if request.user == course.instructor %}
+        <a href="{% url 'add_module' course.id %}" class="btn btn-success mb-3">Add Module</a>
+        {% endif %}
+        {% endif %}
+      </div>
+
+      <div class="card shadow-sm text-start">
+        <div class="card-body">
+        {% for module in modules %}
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4 class="mb-1">{{ module.title|default:"(Untitled module)" }}</h4>
+                <p class="text-muted">{{ module.description|truncatechars:120|default:"No description." }}</p>
+              </div>
+              <div>
+                {% if user.is_authenticated and user.user_type == 'I' %}
+                {% if request.user == course.instructor %}
+                <a href="{% url 'add_lesson' module.id %}" class="btn btn-primary">Add Lesson</a>
+                {% endif %}
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mt-2">
+              <ul class="mb-4">
+                  {% for lesson in module.lessons.all %}
+                        <li>
+                          <strong>{{ lesson.title }}</strong>
+                          {% if lesson.content %}
+                          <div class="small text-muted">{{ lesson.content|truncatechars:120 }}</div>
+                          {% endif %}
+                          {% if lesson.content_type == 'V' and lesson.video_url %}
+                          <div><a href="{{ lesson.video_url }}" target="_blank">Watch video</a></div>
+                          {% elif lesson.content_type == 'A' and lesson.assessment_url %}
+                          <div><a href="{{ lesson.assessment_url }}" target="_blank">Open assessment</a></div>
+                          {% elif lesson.content_type == 'D' and lesson.document %}
+                          <div><a href="{{ lesson.document.url }}" target="_blank">Download document</a></div>
+                          {% endif %}
+                          {% if user.is_authenticated and user.user_type == 'S' %}
+                          {% if lesson.id in completed_lessons %}
+                          <span class="btn btn-success">Completed</span>
+                          {% else %}
+                          <a href="{% url 'mark_lesson_completed' lesson.id %}" class="btn btn-sm btn-success">Mark Complete</a>
+                          {% endif %}
+                          {% endif %}
+                        </li>
+                      {% empty %}
+                        {% if user.is_authenticated and user.user_type == 'S' %}
+                          <li>No lessons yet</li>
+                          {% else %}
+                          <li>No Lessons yet. Click “Add Lessons” to create one.</li>
+                          {% endif %}
+                  {% endfor %}
+              </ul>
+            </div>
+            <hr>
+            {% empty %}
+            {% if user.is_authenticated and user.user_type == 'S' %}
+            <p>No Modules yet.</p>
+            {% else %}
+            <p>No modules yet. Click “Add Module” to create one.</p>
+            {% endif %}
+            {% endfor %}
+          </div> 
+          {% if user.is_authenticated and user.user_type == 'S' %}
+          {% if module.lessons != 0 and module != 0 %}
+          {% if course_completed %}
+          <button type="button" class="btn btn-success">Course Completed</button>
+          {% elif can_complete_course %}
+          <form action="{% url 'mark_course_completed' course.id %}" method="POST">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-success w-100" value="Mark Course Complete">
+          </form>
+          {% elif module.lessons >= 1 %}
+          <button type="button" class="btn btn-danger w-100">Complete all Lessons to Complete Course</button>
+          {% else %}
+          
+          {% endif %}
+          {% endif %}
+          {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

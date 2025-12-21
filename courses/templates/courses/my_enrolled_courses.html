@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container mt-4">
+    <h1 class="mb-4">My Enrolled Courses</h1>
+    <div class="list-group">
+        {% for enrolled_course in enrolled_courses %}
+        <a href="{% url 'course_detail' enrolled_course.course.id %}" class="list-group-item list-group-item-action">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ enrolled_course.course.title }}</h5>
+                <small>Enrolled on: {{ enrolled_course.enrolled_on|date:"M d, Y" }}</small>
+            </div>
+            <p class="mb-1 text-muted">Instructor: {{ enrolled_course.course.instructor.username }}</p>
+        </a>
+        {% empty %}
+        <div class="alert alert-info">
+            You haven't enrolled in any courses yet.
+            <a href="{% url 'course_list' %}" class="alert-link">Browse available courses.</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

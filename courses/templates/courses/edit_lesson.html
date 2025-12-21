@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2>Edit Lesson: {{ lesson.title }}</h2>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Lesson Title</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="text-danger">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.content.id_for_label }}" class="form-label">Lesson Content</label>
+                    {{ form.content }}
+                    {% if form.content.errors %}
+                        <div class="text-danger">{{ form.content.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.video_url.id_for_label }}" class="form-label">Video URL (if applicable)</label>
+                    {{ form.video_url }}
+                    {% if form.video_url.errors %}
+                        <div class="text-danger">{{ form.video_url.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.assessment_url.id_for_label }}" class="form-label">Assessment URL (if applicable)</label>
+                    {{ form.assessment_url }}
+                    {% if form.assessment_url.errors %}
+                        <div class="text-danger">{{ form.assessment_url.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.document.id_for_label }}" class="form-label">Upload Document (if applicable)</label>
+                    {{ form.document }}
+                    {% if form.document.errors %}
+                        <div class="text-danger">{{ form.document.errors }}</div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="{% url 'module_content' lesson.module.course.id %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,112 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Edtech</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS v5.3.2 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bolder fst-italic text-primary" href="{% url 'home' %}">BrightLearn</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#collapsibleNavId" aria-controls="collapsibleNavId" aria-expanded="false"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="collapsibleNavId">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'course_list' %}">Courses</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'about_us' %}">About</a>
+                        </li>
+                        {% if request.user.is_authenticated %}
+                        {% if request.user.user_type == 'I' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'my_courses' %}">My Courses</a>
+                        </li>
+                        {% elif request.user.user_type == 'S' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'my_enrolled_courses' %}">My Enrolled Courses</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'saved_courses' %}">Saved Courses</a>
+                        </li>
+                        {% endif %}
+                        {% endif %}
+                    </ul>
+                    <div class="navbar-nav ms-auto">
+                        {% if request.user.is_authenticated %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Welcome, {{ request.user.username }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'profile_details' %}">Profile</a></li>
+
+                                {% if request.user.user_type == 'I' %}
+                                <li><a class="dropdown-item" href="{% url 'my_courses' %}">My Courses (Instructor)</a>
+                                </li>
+                                <li><a class="dropdown-item" href="{% url 'course_create' %}">Post New Course</a></li>
+                                {% elif request.user.user_type == 'S' %}
+                                <li><a class="dropdown-item" href="{% url 'my_enrolled_courses' %}">My Enrolled
+                                        Courses</a></li>
+                                <li><a class="dropdown-item" href="{% url 'saved_courses' %}">Saved Courses</a></li>
+                                {% endif %}
+
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">Logout</a></li>
+                            </ul>
+                        </li>
+                        {% else %}
+                        <a class="btn btn-outline-primary me-2" href="{% url 'login' %}">Login</a>
+                        <a class="btn btn-primary" href="{% url 'register' %}">Register</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="container mt-3">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </header>
+    <main class="container">
+        {% block main %}
+
+        {% endblock main %}
+    </main>
+    <footer class="mt-5">
+        <!-- place footer here -->
+    </footer>
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
+        integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

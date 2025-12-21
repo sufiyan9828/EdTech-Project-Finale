@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Update Profile</h2>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <div class="mb-4">
+                        <img src="{{ user.get_profile_photo_url }}" class="rounded-circle border border-primary p-1" width="150" height="150" alt="Profile Photo" style="object-fit: cover;">
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ form.profile_photo.id_for_label }}" class="form-label">Profile Photo</label>
+                            {{ form.profile_photo }}
+                            <div class="form-text text-muted">Upload a new profile photo</div>
+                            {% if form.profile_photo.errors %}
+                                <div class="text-danger">{{ form.profile_photo.errors }}</div>
+                            {% endif %}
+                        </div>
+                        {% for field in form %}
+                            {% if field.name != 'profile_photo' %}
+                                <div class="mb-3">
+                                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="text-danger">{{ field.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <a href="{% url 'profile_details' %}" class="btn btn-secondary ms-2">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

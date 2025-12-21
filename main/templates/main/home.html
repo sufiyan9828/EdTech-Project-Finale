@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block main %}
+<div class="container my-5">
+    <div class="card mb-3">
+        <div class="card-body shadow-lg">
+            <div class="hero-section bg-white p-5 rounded-3 shadow-lg opacity-100 text-center">
+                <h1 class="fw-bold">Welcome to <span style="color:#007bff;">BrightLearn</span></h1>
+                <p class="lead">Learn new skills from expert instructors and advance your career </p>
+                <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-4">Get Started</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body shadow-lg">
+            <div class="text-center">
+                <h2 class="fw-bold mb-3">Why Choose BrightLearn?</h2>
+                <p class="text-muted">We make learning simple, flexible, and effective for everyone.</p>
+                <hr>
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body shadow-lg p-3 border-0 h-100">
+                                <h5 class="fw-bold"> Expert-Led Courses</h5>
+                                <p>Learn from industry experts who bring real-world experience to the classroom.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-lg p-3 border-0 h-100">
+                            <h5 class="fw-bold"> Learn Anytime, Anywhere</h5>
+                            <p>Access courses from any device, whenever and wherever you want.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card shadow-lg p-3 border-0 h-100">
+                            <h5 class="fw-bold"> Career-Focused Learning</h5>
+                            <p>BrightLearn helps you gain practical skills to boost your career opportunities.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Course Catalog -->
+    <h2 class="mb-4 fw-bold">Courses Catalog</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for course in courses%}
+        <div class="col">
+            <div class="card h-100 shadow-lg border-0">
+                {% if course.image %}
+                <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.title }}">
+                {% else %}
+                <div class="card-img-top bg-secondary text-white p-5 text-center">No Image</div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ course.title }}</h5>
+                    <p class="card-text">{{ course.description|truncatechars:100 }}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="text-muted">By {{ course.instructor.username }}</small>
+                        <a href="{% url 'course_detail' course.id %}" class="btn btn-sm btn-outline-primary">View
+                            Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-center">No courses available yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <hr>
+    
+    <!-- View All Courses Button -->
+    <div class="text-center mt-4">
+        <a href="{% url 'course_list' %}" class="btn btn-outline-primary btn-lg px-4">View All Courses</a>
+    </div>
+</div>
+
+
+{% endblock %}

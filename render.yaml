@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: my-app
+    env: python
+    buildCommand: ./build.sh
+    startCommand: gunicorn EdTech.wsgi:application

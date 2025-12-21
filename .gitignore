@@ -1,9 +1,69 @@
-
+# Python
 __pycache__/
 *.pyc
-
-db.sqlite3
-
+*.pyo
+*.pyd
+.Python
+env/
 venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.nox/
+.eggs/
+*.egg-info/
+*.egg
 
-media/
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+/media/
+/staticfiles/
+
+# Environment variables
+.env
+.env.*
+
+# OS-specific
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+.directory
+
+# IDEs / Editors
+# VS Code
+.vscode/
+.history/
+
+# PyCharm
+.idea/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Build artifacts
+/build/
+/dist/
+*.spec
+
+# Render
+# Render may create temporary files.
+# It's good practice to ignore common temporary file patterns.
+*.tmp
+*.bak
+*.swp

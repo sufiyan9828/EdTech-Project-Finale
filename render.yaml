@@ -1,6 +1,22 @@
+databases:
+  - name: EdTechDB
+    databaseName: edtechdb
+    user: edtechuser
+    plan: free
+
 services:
   - type: web
-    name: my-app
+    name: EdTech-App
     env: python
+    pythonVersion: '3.11'
     buildCommand: ./build.sh
     startCommand: gunicorn EdTech.wsgi:application
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: EdTechDB
+          property: connectionString
+      - key: c+6r7rh9i*g4onyajlgvc*4)o-csub)#84b#y^2ka&7h4963yp
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4

@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-_5#sem*oz^mpm)e)g%55co!$j2sejw5ob-d)t%@s75j-u+b2ie'
 
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = ["*"]
 
@@ -66,12 +66,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'EdTech.wsgi.application' 
 
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600
+    )
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {

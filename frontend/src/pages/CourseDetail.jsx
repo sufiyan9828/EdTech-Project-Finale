@@ -2,49 +2,99 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 function CourseDetail() {
-  const { id } = useParams() // 1. Get the ID from the URL
+  const { id } = useParams()
   const [course, setCourse] = useState(null)
+  const [activeLesson, setActiveLesson] = useState(null) // <--- NEW: Tracks what is playing
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:8000/courses/api/${id}/`) // 2. Fetch specific course
+    fetch(`http://127.0.0.1:8000/courses/api/${id}/`)
       .then(res => res.json())
-      .then(data => setCourse(data))
+      .then(data => {
+        setCourse(data)
+        // Auto-select the first lesson if it exists
+        if (data.modules.length > 0 && data.modules[0].lessons.length > 0) {
+            setActiveLesson(data.modules[0].lessons[0])
+        }
+      })
       .catch(err => console.error(err))
   }, [id])
 
-  if (!course) return <div>Loading Class...</div>
+  // Helper: Convert YouTube watch URL to Embed URL
+  const getEmbedUrl = (url) => {
+    if (!url) return null;
+    const videoId = url.split('v=')[1];
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : url;
+  }
+
+  if (!course) return <div style={{padding: '20px'}}>Loading Class...</div>
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
+    <div style={{ padding: '20px', display: 'flex', gap: '20px', height: '80vh' }}>
       
-      {/* Header Section */}
-      <div style={{ background: '#333', color: 'white', padding: '30px', borderRadius: '10px' }}>
-        <h1>{course.title}</h1>
-        <p>{course.description}</p>
-        <p><strong>Instructor: {course.instructor_name}</strong></p>
+      {/* LEFT COLUMN: Main Stage (The Player) */}
+      <div style={{ flex: 3, border: '1px solid #ddd', borderRadius: '10px', padding: '20px', background: '#fff' }}>
+        
+        {activeLesson ? (
+            <div>
+                <h2 style={{ borderBottom: '2px solid #f0f0f0', paddingBottom: '10px' }}>{activeLesson.title}</h2>
+                
+                {/* VIDEO PLAYER LOGIC */}
+                {activeLesson.content_type === 'V' && (
+                    <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', borderRadius: '8px' }}>
+                        <iframe 
+                            src={getEmbedUrl(activeLesson.video_url)} 
+                            title={activeLesson.title}
+                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                            allowFullScreen
+                        ></iframe>
+                    </div>
+                )}
+
+                {/* TEXT/DOCUMENT LOGIC */}
+                {activeLesson.content_type === 'D' && (
+                    <div style={{ padding: '20px', background: '#f9f9f9', marginTop: '20px' }}>
+                        <p>📄 This lesson contains a document.</p>
+                        {activeLesson.document && <a href={activeLesson.document} target="_blank" rel="noreferrer">Download Document</a>}
+                    </div>
+                )}
+
+                <p style={{ marginTop: '20px', color: '#555' }}>{activeLesson.content}</p>
+            </div>
+        ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                <h3>Select a lesson to start learning</h3>
+            </div>
+        )}
       </div>
 
-      {/* Curriculum Section */}
-      <div style={{ marginTop: '30px' }}>
-        <h2>Curriculum</h2>
-        
-        {/* Loop through Modules */}
+      {/* RIGHT COLUMN: Sidebar (The Syllabus) */}
+      <div style={{ flex: 1, border: '1px solid #ddd', borderRadius: '10px', overflowY: 'auto', background: '#f9f9f9' }}>
+        <div style={{ padding: '15px', background: '#333', color: 'white' }}>
+            <h3 style={{ margin: 0 }}>Course Content</h3>
+        </div>
+
         {course.modules.map(module => (
-          <div key={module.id} style={{ marginBottom: '20px', border: '1px solid #ccc', borderRadius: '5px' }}>
-            <div style={{ background: '#f9f9f9', padding: '15px', borderBottom: '1px solid #eee' }}>
-              <h3>{module.title}</h3>
+          <div key={module.id}>
+            <div style={{ padding: '10px 15px', background: '#e0e0e0', fontWeight: 'bold', fontSize: '0.9em' }}>
+              {module.title}
             </div>
             
-            {/* Loop through Lessons inside the Module */}
-            <div style={{ padding: '15px' }}>
-              {module.lessons.map(lesson => (
-                <div key={lesson.id} style={{ padding: '10px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between' }}>
-                  <span>📄 {lesson.title}</span>
-                  {lesson.content_type === 'V' && <span style={{color: 'red'}}>Video</span>}
-                </div>
-              ))}
-              {module.lessons.length === 0 && <p>No lessons yet.</p>}
-            </div>
+            {module.lessons.map(lesson => (
+              <div 
+                key={lesson.id} 
+                onClick={() => setActiveLesson(lesson)} // <--- CLICK TO PLAY
+                style={{ 
+                    padding: '12px 15px', 
+                    cursor: 'pointer', 
+                    background: activeLesson && activeLesson.id === lesson.id ? '#d1e7dd' : 'transparent', // Highlight active
+                    borderBottom: '1px solid #eee',
+                    display: 'flex', alignItems: 'center', gap: '10px'
+                }}
+              >
+                <span>{lesson.content_type === 'V' ? '🎥' : '📄'}</span>
+                <span style={{ fontSize: '0.9em' }}>{lesson.title}</span>
+              </div>
+            ))}
           </div>
         ))}
       </div>

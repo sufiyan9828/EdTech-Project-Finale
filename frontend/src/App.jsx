@@ -1,34 +1,23 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react'
 
 function App() {
-  const [count, setCount] = useState(0)
+  // 1. "Memory" to hold our backend message
+  const [message, setMessage] = useState('')
+
+  // 2. "Startup Script" to fetch data when page loads
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/api/test/')
+      .then(response => response.json())
+      .then(data => setMessage(data.message))
+      .catch(error => console.error('Error:', error));
+  }, []) // The empty [] means "run this only once on load"
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div style={{ textAlign: 'center', marginTop: '50px' }}>
+      <h1>React + Django Integration</h1>
+      {/* Display the message from backend */}
+      <h2>Status: {message ? message : "Loading..."}</h2>
+    </div>
   )
 }
 

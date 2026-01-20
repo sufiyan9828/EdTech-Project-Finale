@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import CourseList from '../components/CourseList' // <--- IMPORT THIS
 
 function Dashboard() {
   const [message, setMessage] = useState('')
@@ -8,11 +9,10 @@ function Dashboard() {
   useEffect(() => {
     const token = localStorage.getItem('access_token')
     if (!token) {
-      navigate('/login') // Kick user out if no token
+      navigate('/login')
       return
     }
 
-    // Fetch the secret message
     fetch('http://127.0.0.1:8000/api/test/', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
@@ -23,7 +23,13 @@ function Dashboard() {
   return (
     <div>
       <h1>Student Dashboard</h1>
-      <p>Secret Message: {message}</p>
+      <p>Welcome back! (Backend Status: {message})</p>
+      
+      <hr style={{ margin: '30px 0' }} />
+      
+      {/* <--- USE THE COMPONENT HERE */}
+      <CourseList /> 
+      
     </div>
   )
 }

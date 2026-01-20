@@ -8,6 +8,9 @@ urlpatterns = [
     path('api/<int:id>/', views.CourseDetailAPI.as_view(), name='course_detail_api'),
     path('api/my-courses/', views.MyCoursesListAPI.as_view(), name='my_courses_api'),
     path('api/<int:course_id>/enroll/', views.EnrollCourseAPI.as_view(), name='enroll_course_api'),
+    path('api/<int:course_id>/progress/', views.CourseProgressAPI.as_view(), name='course_progress_api'),
+    path('api/lesson/<int:lesson_id>/toggle-complete/', views.ToggleLessonCompletionAPI.as_view(), name='toggle_lesson_complete_api'),
+    
     # OLD ENROLL PATH
     path('create/', views.course_create, name='course_create'),
     path('my-courses/', views.my_courses, name='my_courses'),

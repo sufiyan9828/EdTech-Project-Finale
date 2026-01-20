@@ -18,7 +18,42 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
 
-# ... existing views ...
+class CourseProgressAPI(APIView):
+    """
+    Returns a list of lesson IDs that the specific user has completed in a specific course.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, course_id):
+        # Get all completed lesson objects for this user and course
+        completed_lessons = LessonComplete.objects.filter(
+            student=request.user,
+            lesson__module__course_id=course_id
+        ).values_list('lesson_id', flat=True)
+        
+        return Response({"completed_lesson_ids": list(completed_lessons)})
+
+class ToggleLessonCompletionAPI(APIView):
+    """
+    Marks a lesson as complete (or incomplete if clicked again).
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, lesson_id):
+        lesson = get_object_or_404(Lesson, id=lesson_id)
+        student = request.user
+        
+        # Check if already completed
+        completion_record = LessonComplete.objects.filter(student=student, lesson=lesson).first()
+
+        if completion_record:
+            # If exists, delete it (Undo completion)
+            completion_record.delete()
+            return Response({"status": "uncompleted"})
+        else:
+            # If not exists, create it
+            LessonComplete.objects.create(student=student, lesson=lesson)
+            return Response({"status": "completed"})
 
 class MyCoursesListAPI(generics.ListAPIView):
     """

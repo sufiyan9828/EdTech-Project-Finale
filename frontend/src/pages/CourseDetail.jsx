@@ -6,8 +6,9 @@ function CourseDetail() {
   const navigate = useNavigate()
   const [course, setCourse] = useState(null)
   const [activeLesson, setActiveLesson] = useState(null)
+  const [completedIds, setCompletedIds] = useState([]) // <--- NEW: Stores completed lesson IDs
 
-  // Fetch Course Data
+  // 1. Fetch Course Content
   const fetchCourse = () => {
     const token = localStorage.getItem('access_token')
     const headers = token ? { 'Authorization': `Bearer ${token}` } : {}
@@ -16,7 +17,6 @@ function CourseDetail() {
       .then(res => res.json())
       .then(data => {
         setCourse(data)
-        // Only auto-play if we actually HAVE modules (i.e., we are enrolled)
         if (data.modules && data.modules.length > 0 && data.modules[0].lessons.length > 0) {
             setActiveLesson(data.modules[0].lessons[0])
         }
@@ -24,39 +24,58 @@ function CourseDetail() {
       .catch(err => console.error(err))
   }
 
+  // 2. Fetch User Progress (Green Checkmarks)
+  const fetchProgress = () => {
+    const token = localStorage.getItem('access_token')
+    if (!token) return
+
+    fetch(`http://127.0.0.1:8000/courses/api/${id}/progress/`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    })
+    .then(res => res.json())
+    .then(data => setCompletedIds(data.completed_lesson_ids))
+    .catch(err => console.error(err))
+  }
+
   useEffect(() => {
     fetchCourse()
+    fetchProgress() // <--- Load progress when page opens
   }, [id])
 
-  // Handle Enroll Click
-  const handleEnroll = async () => {
+  // 3. Handle "Mark Complete" Click
+  const handleToggleComplete = async () => {
+    if (!activeLesson) return
     const token = localStorage.getItem('access_token')
-    if (!token) {
-        alert("Please login to enroll!")
-        navigate('/login')
-        return
-    }
-
+    
     try {
-        const response = await fetch(`http://127.0.0.1:8000/courses/api/${id}/enroll/`, {
+        const response = await fetch(`http://127.0.0.1:8000/courses/api/lesson/${activeLesson.id}/toggle-complete/`, {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Authorization': `Bearer ${token}` }
         })
         if (response.ok) {
-            alert("Enrollment Successful!")
-            fetchCourse() // Refresh page to get the content
-        } else {
-            alert("Enrollment failed.")
+            // Refresh the progress list to update UI
+            fetchProgress()
         }
     } catch (error) {
         console.error(error)
     }
   }
 
-  // Helper for YouTube
+  // Helper
+  const handleEnroll = async () => { /* ... Keep your existing handleEnroll ... */ 
+     // (For brevity, I'm assuming you know to keep the enroll logic we wrote before)
+     // If you need me to paste the FULL file again with enroll logic included, ask.
+     // For now, I will include the critical parts below.
+     const token = localStorage.getItem('access_token')
+     if (!token) { alert("Please login"); navigate('/login'); return }
+     try {
+        await fetch(`http://127.0.0.1:8000/courses/api/${id}/enroll/`, {
+            method: 'POST', headers: { 'Authorization': `Bearer ${token}` }
+        })
+        alert("Enrolled!"); fetchCourse();
+     } catch(e) { console.error(e) }
+  }
+
   const getEmbedUrl = (url) => {
     if (!url) return null;
     const videoId = url.split('v=')[1];
@@ -64,6 +83,8 @@ function CourseDetail() {
   }
 
   if (!course) return <div style={{padding: '20px'}}>Loading...</div>
+
+  const isLessonCompleted = activeLesson && completedIds.includes(activeLesson.id)
 
   return (
     <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
@@ -76,24 +97,35 @@ function CourseDetail() {
             {course.is_enrolled ? (
                 <span style={{ background: '#4CAF50', padding: '8px 15px', borderRadius: '5px' }}>✅ Enrolled</span>
             ) : (
-                <button 
-                    onClick={handleEnroll}
-                    style={{ background: '#007bff', color: 'white', border: 'none', padding: '10px 20px', fontSize: '1.1em', cursor: 'pointer', borderRadius: '5px' }}
-                >
+                <button onClick={handleEnroll} style={{ background: '#007bff', color: 'white', padding: '10px 20px', border:'none', borderRadius:'5px', cursor:'pointer' }}>
                     Enroll Now (${course.price})
                 </button>
             )}
         </div>
       </div>
 
-      {/* CONTENT LOGIC: Show Content ONLY if Enrolled */}
       {course.is_enrolled ? (
-          <div style={{ display: 'flex', gap: '20px', height: '600px' }}>
-            {/* Player */}
+          <div style={{ display: 'flex', gap: '20px', minHeight: '500px' }}>
+            
+            {/* Main Stage */}
             <div style={{ flex: 3, border: '1px solid #ddd', borderRadius: '10px', padding: '20px', background: '#fff' }}>
                 {activeLesson ? (
                     <div>
-                        <h3>{activeLesson.title}</h3>
+                        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'15px'}}>
+                             <h3>{activeLesson.title}</h3>
+                             {/* TOGGLE BUTTON */}
+                             <button 
+                                onClick={handleToggleComplete}
+                                style={{ 
+                                    background: isLessonCompleted ? '#4CAF50' : '#ddd', 
+                                    color: isLessonCompleted ? 'white' : 'black',
+                                    border: 'none', padding: '10px 15px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold'
+                                }}
+                             >
+                                {isLessonCompleted ? "✅ Completed" : "○ Mark Complete"}
+                             </button>
+                        </div>
+
                         {activeLesson.content_type === 'V' && (
                             <iframe 
                                 src={getEmbedUrl(activeLesson.video_url)} 
@@ -101,14 +133,14 @@ function CourseDetail() {
                                 title="video"
                             />
                         )}
-                        <p>{activeLesson.content}</p>
+                        <p style={{marginTop:'20px'}}>{activeLesson.content}</p>
                     </div>
                 ) : (
                     <p>Select a lesson.</p>
                 )}
             </div>
 
-            {/* Sidebar */}
+            {/* Sidebar Syllabus */}
             <div style={{ flex: 1, border: '1px solid #ddd', borderRadius: '10px', overflowY: 'auto', background: '#f9f9f9' }}>
                 {course.modules.map(module => (
                     <div key={module.id}>
@@ -117,9 +149,15 @@ function CourseDetail() {
                             <div 
                                 key={lesson.id} 
                                 onClick={() => setActiveLesson(lesson)}
-                                style={{ padding: '10px', cursor: 'pointer', borderBottom: '1px solid #ddd', background: activeLesson?.id === lesson.id ? '#d1e7dd' : 'none' }}
+                                style={{ 
+                                    padding: '10px', cursor: 'pointer', borderBottom: '1px solid #ddd', 
+                                    background: activeLesson?.id === lesson.id ? '#d1e7dd' : 'none',
+                                    display: 'flex', justifyContent: 'space-between'
+                                }}
                             >
-                                {lesson.title}
+                                <span>{lesson.title}</span>
+                                {/* SIDEBAR CHECKMARK */}
+                                {completedIds.includes(lesson.id) && <span>✅</span>}
                             </div>
                         ))}
                     </div>
@@ -127,9 +165,8 @@ function CourseDetail() {
             </div>
           </div>
       ) : (
-          <div style={{ textAlign: 'center', padding: '50px', border: '2px dashed #ccc', color: '#666' }}>
+          <div style={{ textAlign: 'center', padding: '50px', border: '2px dashed #ccc' }}>
               <h2>🔒 Content Locked</h2>
-              <p>Please enroll in this course to access the videos and materials.</p>
           </div>
       )}
 

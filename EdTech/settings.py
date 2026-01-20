@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     # Third-party apps
     'rest_framework',  # NEW
     'corsheaders',     # NEW
+    'rest_framework.authtoken', #NEW
+    'djoser',          #NEW
     # Local apps
     'accounts',
     'courses',
@@ -117,3 +119,20 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.user'
 
+# REST Framework Configuration
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated', # Lock down the API by default
+    ],
+}
+
+# JWT Configuration (Optional: Customizing token lifetime)
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}

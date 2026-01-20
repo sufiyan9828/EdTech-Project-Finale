@@ -12,10 +12,19 @@ from xhtml2pdf import pisa
 
 # Add to Imports
 from rest_framework import generics, permissions
-from .serializers import CourseSerializer
 from .models import Course
+from .serializers import CourseSerializer, CourseDetailSerializer # <--- Update Import
 
 # ... existing views ...
+
+class CourseDetailAPI(generics.RetrieveAPIView):
+    """
+    Returns a single course with all its modules and lessons.
+    """
+    queryset = Course.objects.all()
+    serializer_class = CourseDetailSerializer
+    permission_classes = [permissions.AllowAny] # Open for now
+    lookup_field = 'id'
 
 # Add to Bottom
 class CourseListAPI(generics.ListAPIView):

@@ -3,8 +3,12 @@ from . import views
 
 urlpatterns = [
     path('', views.course_list, name='course_list'),
+    # NEW ENROLL PATH
     path('api/list/', views.CourseListAPI.as_view(), name='course_list_api'),
     path('api/<int:id>/', views.CourseDetailAPI.as_view(), name='course_detail_api'),
+    path('api/my-courses/', views.MyCoursesListAPI.as_view(), name='my_courses_api'),
+    path('api/<int:course_id>/enroll/', views.EnrollCourseAPI.as_view(), name='enroll_course_api'),
+    # OLD ENROLL PATH
     path('create/', views.course_create, name='course_create'),
     path('my-courses/', views.my_courses, name='my_courses'),
     path('<int:course_id>/enrollments/', views.view_enrollments, name='view_enrollments'),

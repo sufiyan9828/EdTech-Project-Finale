@@ -14,8 +14,36 @@ from xhtml2pdf import pisa
 from rest_framework import generics, permissions
 from .models import Course
 from .serializers import CourseSerializer, CourseDetailSerializer # <--- Update Import
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
 
 # ... existing views ...
+
+class MyCoursesListAPI(generics.ListAPIView):
+    """
+    Returns only the courses the logged-in user is enrolled in.
+    """
+    serializer_class = CourseSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # "enrollments" is the related_name we defined in models.py
+        return Course.objects.filter(enrollments__student=self.request.user)
+
+class EnrollCourseAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, course_id):
+        course = get_object_or_404(Course, id=course_id)
+        enrollment, created = Enrollment.objects.get_or_create(
+            student=request.user,
+            course=course
+        )
+        if not created:
+            return Response({"detail": "Already enrolled."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({"detail": "Enrollment successful!"}, status=status.HTTP_201_CREATED)
 
 class CourseDetailAPI(generics.RetrieveAPIView):
     """

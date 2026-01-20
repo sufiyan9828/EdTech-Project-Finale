@@ -3,6 +3,7 @@ import Navbar from './components/Navbar'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import CourseDetail from './pages/CourseDetail' // <--- IMPORT THIS
+import MyCourses from './pages/MyCourses' // <--- Import
 
 function App() {
   return (
@@ -16,7 +17,8 @@ function App() {
           {/* NEW DYNAMIC ROUTE */}
           {/* :id is a variable placeholder */}
           <Route path="/course/:id" element={<CourseDetail />} /> 
-          
+          <Route path="/my-courses" element={<MyCourses />} />
+
         </Routes>
       </div>
     </BrowserRouter>

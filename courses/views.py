@@ -10,6 +10,23 @@ from django.http import HttpResponse
 from io import BytesIO
 from xhtml2pdf import pisa
 
+# Add to Imports
+from rest_framework import generics, permissions
+from .serializers import CourseSerializer
+from .models import Course
+
+# ... existing views ...
+
+# Add to Bottom
+class CourseListAPI(generics.ListAPIView):
+    """
+    Returns a list of all courses.
+    Publicly accessible (no login required to view catalog).
+    """
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    permission_classes = [permissions.AllowAny] # Open to everyone
+
 
 def is_instructor(user):
     return user.is_authenticated and user.user_type == 'I'

@@ -2,11 +2,12 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('', views.course_list, name='course_list'),
+    path('api/list/', views.CourseListAPI.as_view(), name='course_list_api'),
     path('create/', views.course_create, name='course_create'),
     path('my-courses/', views.my_courses, name='my_courses'),
     path('<int:course_id>/enrollments/', views.view_enrollments, name='view_enrollments'),
     path('enrollments/<int:enrollment_id>/', views.enrollment_details, name='enrollment_details'),
-    path('', views.course_list, name='course_list'),
     path('<int:course_id>/enroll/', views.enroll_course, name='enroll_course'),
     path('my-enrollments/', views.my_enrolled_courses, name='my_enrolled_courses'),
     path('saved/', views.saved_courses, name='saved_courses'),

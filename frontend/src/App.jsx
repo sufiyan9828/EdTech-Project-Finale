@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import CourseDetail from './pages/CourseDetail' // <--- IMPORT THIS
 
 function App() {
   return (
@@ -11,6 +12,11 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />
+          
+          {/* NEW DYNAMIC ROUTE */}
+          {/* :id is a variable placeholder */}
+          <Route path="/course/:id" element={<CourseDetail />} /> 
+          
         </Routes>
       </div>
     </BrowserRouter>

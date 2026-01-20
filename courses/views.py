@@ -11,93 +11,16 @@ from io import BytesIO
 from xhtml2pdf import pisa
 
 # Add to Imports
-from rest_framework import generics, permissions
-from .models import Course
-from .serializers import CourseSerializer, CourseDetailSerializer # <--- Update Import
+from rest_framework import generics, permissions, status
+from .serializers import CourseSerializer, CourseDetailSerializer, MyCourseSerializer # <--- Import it!
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, permissions
 
-class CourseProgressAPI(APIView):
-    """
-    Returns a list of lesson IDs that the specific user has completed in a specific course.
-    """
-    permission_classes = [permissions.IsAuthenticated]
+from django.template.loader import render_to_string
+from django.http import HttpResponse
+from io import BytesIO
+from xhtml2pdf import pisa
 
-    def get(self, request, course_id):
-        # Get all completed lesson objects for this user and course
-        completed_lessons = LessonComplete.objects.filter(
-            student=request.user,
-            lesson__module__course_id=course_id
-        ).values_list('lesson_id', flat=True)
-        
-        return Response({"completed_lesson_ids": list(completed_lessons)})
-
-class ToggleLessonCompletionAPI(APIView):
-    """
-    Marks a lesson as complete (or incomplete if clicked again).
-    """
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request, lesson_id):
-        lesson = get_object_or_404(Lesson, id=lesson_id)
-        student = request.user
-        
-        # Check if already completed
-        completion_record = LessonComplete.objects.filter(student=student, lesson=lesson).first()
-
-        if completion_record:
-            # If exists, delete it (Undo completion)
-            completion_record.delete()
-            return Response({"status": "uncompleted"})
-        else:
-            # If not exists, create it
-            LessonComplete.objects.create(student=student, lesson=lesson)
-            return Response({"status": "completed"})
-
-class MyCoursesListAPI(generics.ListAPIView):
-    """
-    Returns only the courses the logged-in user is enrolled in.
-    """
-    serializer_class = CourseSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        # "enrollments" is the related_name we defined in models.py
-        return Course.objects.filter(enrollments__student=self.request.user)
-
-class EnrollCourseAPI(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request, course_id):
-        course = get_object_or_404(Course, id=course_id)
-        enrollment, created = Enrollment.objects.get_or_create(
-            student=request.user,
-            course=course
-        )
-        if not created:
-            return Response({"detail": "Already enrolled."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response({"detail": "Enrollment successful!"}, status=status.HTTP_201_CREATED)
-
-class CourseDetailAPI(generics.RetrieveAPIView):
-    """
-    Returns a single course with all its modules and lessons.
-    """
-    queryset = Course.objects.all()
-    serializer_class = CourseDetailSerializer
-    permission_classes = [permissions.AllowAny] # Open for now
-    lookup_field = 'id'
-
-# Add to Bottom
-class CourseListAPI(generics.ListAPIView):
-    """
-    Returns a list of all courses.
-    Publicly accessible (no login required to view catalog).
-    """
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
-    permission_classes = [permissions.AllowAny] # Open to everyone
 
 
 def is_instructor(user):
@@ -463,11 +386,139 @@ def generate_certificate(request, course_id):
     html_string = render_to_string('courses/certificate_template.html', context)
 
     result = BytesIO()
-    pdf = pisa.pisaDocument(BytesIO(html_string.encode("UTF-8")), result)
-    if pdf.err:
+    pdf_context = pisa.CreatePDF(html_string, dest=result)
+    if pdf_context.err:
         messages.error(request, "Error generating PDF")
         return redirect('course_detail', course_id=course.id)
 
     response = HttpResponse(result.getvalue(), content_type='application/pdf')
     response['Content-Disposition'] = f'inline; filename="certificate_{student.username}_{course.id}.pdf"'
     return response
+class CertificateAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, course_id):
+        course = get_object_or_404(Course, id=course_id)
+        student = request.user
+
+        # 1. Security Check: Did they actually finish?
+        if not CourseCompletion.objects.filter(student=student, course=course).exists():
+            return Response(
+                {"detail": "You must complete the course to get a certificate."}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # 2. Generate PDF (Same logic as your old view)
+        context = {
+            'student_name': student.username, # Or student.get_full_name()
+            'course_title': course.title,
+            'completion_date': timezone.now().strftime("%B %d, %Y"),
+        }
+        
+        # Ensure you have this template: courses/templates/courses/certificate_template.html
+        html_string = render_to_string('courses/certificate_template.html', context)
+        
+        # NEW CODE (Type-Safe)
+        result = BytesIO()
+        # pisa.CreatePDF is the standard public method and handles types better
+        pisa_status = pisa.CreatePDF(html_string, dest=result)
+        
+        if pisa_status.err:
+            return Response({"detail": "Error generating PDF"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # 3. Return as a File Download
+        response = HttpResponse(result.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="certificate_{course.id}.pdf"'
+        return response
+    
+
+class CourseProgressAPI(APIView):
+    """
+    Returns a list of lesson IDs that the specific user has completed in a specific course.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, course_id):
+        # Get all completed lesson objects for this user and course
+        completed_lessons = LessonComplete.objects.filter(
+            student=request.user,
+            lesson__module__course_id=course_id
+        ).values_list('lesson_id', flat=True)
+        
+        return Response({"completed_lesson_ids": list(completed_lessons)})
+
+
+class ToggleLessonCompletionAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, lesson_id):
+        lesson = get_object_or_404(Lesson, id=lesson_id)
+        student = request.user
+        course = lesson.module.course
+        
+        # 1. Toggle the Lesson
+        completion_record = LessonComplete.objects.filter(student=student, lesson=lesson).first()
+        if completion_record:
+            completion_record.delete()
+            # If they uncheck a lesson, they lose their "Graduate" status
+            CourseCompletion.objects.filter(student=student, course=course).delete()
+            return Response({"status": "uncompleted"})
+        else:
+            LessonComplete.objects.create(student=student, lesson=lesson)
+        
+        # 2. CRITICAL: Check for Graduation (The "Auto-Complete" Logic)
+        total_lessons = Lesson.objects.filter(module__course=course).count()
+        completed_lessons = LessonComplete.objects.filter(
+            student=student, 
+            lesson__module__course=course
+        ).count()
+
+        if total_lessons > 0 and completed_lessons == total_lessons:
+            # THIS LINE IS THE KEY. IT PRINTS THE DIPLOMA.
+            CourseCompletion.objects.get_or_create(student=student, course=course)
+            return Response({"status": "completed", "course_completed": True})
+            
+        return Response({"status": "completed", "course_completed": False})
+        
+# ... existing views ...
+
+class MyCoursesListAPI(generics.ListAPIView):
+    serializer_class = MyCourseSerializer # <--- CHANGE THIS (Was CourseSerializer)
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Course.objects.filter(enrollments__student=self.request.user)
+    
+
+class EnrollCourseAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, course_id):
+        course = get_object_or_404(Course, id=course_id)
+        enrollment, created = Enrollment.objects.get_or_create(
+            student=request.user,
+            course=course
+        )
+        if not created:
+            return Response({"detail": "Already enrolled."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        return Response({"detail": "Enrollment successful!"}, status=status.HTTP_201_CREATED)
+
+class CourseDetailAPI(generics.RetrieveAPIView):
+    """
+    Returns a single course with all its modules and lessons.
+    """
+    queryset = Course.objects.all()
+    serializer_class = CourseDetailSerializer
+    permission_classes = [permissions.AllowAny] # Open for now
+    lookup_field = 'id'
+
+# Add to Bottom
+class CourseListAPI(generics.ListAPIView):
+    """
+    Returns a list of all courses.
+    Publicly accessible (no login required to view catalog).
+    """
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    permission_classes = [permissions.AllowAny] # Open to everyone

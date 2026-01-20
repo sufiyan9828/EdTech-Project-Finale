@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Course, Enrollment, Module, Lesson
+from .models import Course, Enrollment, Module, Lesson, LessonComplete # <--- Ensure imports
 
 # 1. The Bottom Layer
 class LessonSerializer(serializers.ModelSerializer):
@@ -53,3 +53,36 @@ class EnrollmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Enrollment
         fields = '__all__'
+
+
+# ... existing serializers ...
+
+class MyCourseSerializer(serializers.ModelSerializer):
+    """
+    Custom serializer for 'My Learning' page.
+    Calculates progress percentage for the specific student.
+    """
+    instructor_name = serializers.ReadOnlyField(source='instructor.username')
+    progress = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Course
+        fields = ['id', 'title', 'description', 'price', 'image', 'instructor_name', 'progress']
+
+    def get_progress(self, obj):
+        # 1. Get the student from the request context
+        student = self.context['request'].user
+        
+        # 2. Count Total Lessons in the Course
+        total_lessons = Lesson.objects.filter(module__course=obj).count()
+        if total_lessons == 0:
+            return 0
+        
+        # 3. Count Completed Lessons for this Student in this Course
+        completed_lessons = LessonComplete.objects.filter(
+            student=student,
+            lesson__module__course=obj
+        ).count()
+        
+        # 4. Calculate Percentage
+        return int((completed_lessons / total_lessons) * 100)

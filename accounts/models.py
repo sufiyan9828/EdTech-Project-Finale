@@ -10,6 +10,14 @@ def get_profile_photo_path(instance, filename):
 class User(AbstractUser):
     name = models.CharField(max_length=70, default='name')
     contact = models.CharField(max_length=13)
+    # NEW PROFILE FIELDS
+    bio = models.TextField(blank=True, null=True)
+    profile_image = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
+    
+    # Social Links
+    git_link = models.URLField(blank=True, null=True)
+    x_link = models.URLField(blank=True, null=True)
+    instagram_link = models.URLField(blank=True, null=True)
     user_type = models.CharField(
         max_length=1,
         choices=(

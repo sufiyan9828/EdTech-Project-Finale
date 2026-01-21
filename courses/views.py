@@ -522,3 +522,22 @@ class CourseListAPI(generics.ListAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     permission_classes = [permissions.AllowAny] # Open to everyone
+
+class MyAchievementsAPI(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        # Get all completion records for this user
+        completions = CourseCompletion.objects.filter(student=request.user).select_related('course')
+        
+        # Build simple JSON manually (faster than making a new serializer file)
+        data = []
+        for c in completions:
+            data.append({
+                "course_id": c.course.id,
+                "course_title": c.course.title,
+                "completed_on": c.completed_on.strftime("%B %d, %Y"), # e.g. "January 21, 2026"
+                "certificate_url": f"http://127.0.0.1:8000/courses/api/course/{c.course.id}/certificate/"
+            })
+        
+        return Response(data)

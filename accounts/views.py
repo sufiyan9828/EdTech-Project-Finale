@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from .forms import RegisterForm, LoginForm, InstructorProfileForm, StudentProfileForm
 from .models import StudentProfile, InstructorProfile, User  
 from courses.models import Course, Enrollment  
+from rest_framework import generics, permissions, parsers
+from .serializers import UserProfileSerializer
 
 
 class Register(View):
@@ -85,8 +87,6 @@ def profile_details(request):
     }
     return render(request, 'accounts/profile.html', context)
 
-
-@login_required
 def profile_update(request):
     user = request.user
     if user.user_type == 'S': 
@@ -156,3 +156,19 @@ def instructor_profile_view(request, user_id):
         'instructor_profile': instructor_profile,
     }
     return render(request, 'accounts/instructor_profile.html', context)
+
+# ... existing views ...
+
+class UserProfileAPI(generics.RetrieveUpdateAPIView):
+    """
+    GET: Retrieve user profile
+    PATCH: Update bio, links, or upload NEW profile image
+    """
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    # This parser is CRITICAL for uploading files (images)
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser] 
+
+    def get_object(self):
+        # We don't need a lookup_field (like pk) because we just return the *current* user
+        return self.request.user

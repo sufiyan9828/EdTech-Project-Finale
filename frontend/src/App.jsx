@@ -4,6 +4,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import CourseDetail from './pages/CourseDetail' // <--- IMPORT THIS
 import MyCourses from './pages/MyCourses' // <--- Import
+import Profile from './pages/Profile'
 
 function App() {
   return (
@@ -13,10 +14,11 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />
-          
+
           {/* NEW DYNAMIC ROUTE */}
           {/* :id is a variable placeholder */}
-          <Route path="/course/:id" element={<CourseDetail />} /> 
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/my-courses" element={<MyCourses />} />
 
         </Routes>

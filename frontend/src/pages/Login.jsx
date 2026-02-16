@@ -1,17 +1,20 @@
 import { useState } from 'react'
-// Remove useNavigate since we are using window.location for the hard refresh
-// import { useNavigate } from 'react-router-dom' 
+import { useNavigate } from 'react-router-dom' // <--- 1. Import this
 
 function Login() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+
+  // vvvvv THIS IS THE MISSING LINE vvvvv
+  const navigate = useNavigate()
+  // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
   const handleLogin = async (e) => {
     e.preventDefault()
     console.log("Attempting login for:", username)
 
     try {
-      // 1. Get Token
+      // 1. Get the Token
       const response = await fetch('http://127.0.0.1:8000/auth/jwt/create/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -25,37 +28,32 @@ function Login() {
         return
       }
 
-      // 2. Save Token
+      // 2. Token Success - Save it
       console.log("Token received:", data.access)
       localStorage.setItem('access_token', data.access)
 
-      // 3. Get Profile (to check Role)
+      // 3. Get the User Role (Profile)
       const profileRes = await fetch('http://127.0.0.1:8000/accounts/api/profile/', {
         headers: { 'Authorization': `Bearer ${data.access}` }
       })
 
-      const profile = await profileRes.json()
-      console.log("Profile received:", profile)
+      if (!profileRes.ok) {
+        // Fallback if profile fails
+        localStorage.setItem('user_role', 'S')
+      } else {
+        const profile = await profileRes.json()
+        console.log("Profile received:", profile)
+        // 4. Save Role
+        localStorage.setItem('user_role', profile.user_type || 'S')
+      }
 
-      // 4. Save Role
-      // Logic: If profile.user_type is empty (like for old admins), default to 'S' (Student)
-      // UNLESS you just fixed it in Step 1, then it will be 'I'
-      // ... inside handleLogin, right after saving the token ...
-
-      localStorage.setItem('access_token', data.access)
-      localStorage.setItem('user_role', profile.user_type || 'S')
-
-      // <--- ADD THIS LINE: Tell the app we logged in
+      // 5. Force Navbar Update & Redirect
       window.dispatchEvent(new Event("storage"))
-
-      navigate('/')
-
-      // 5. HARD REFRESH (Fixes the Navbar/UI issue)
-      window.location.href = '/'
+      navigate('/') // <--- This will now work
 
     } catch (error) {
-      console.error("Network Error:", error)
-      alert("Network Error. Check console.")
+      console.error("Login Error:", error)
+      alert("Something went wrong. Check console.")
     }
   }
 

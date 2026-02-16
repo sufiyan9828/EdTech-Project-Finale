@@ -3,27 +3,25 @@ import { Link, useNavigate } from 'react-router-dom'
 
 function Navbar() {
   const navigate = useNavigate()
-  // Use State so React knows to re-render when this changes
+  // Track BOTH token and role in State
   const [token, setToken] = useState(localStorage.getItem('access_token'))
+  const [role, setRole] = useState(localStorage.getItem('user_role')) // <--- NEW
 
-  // Listen for login/logout events
   useEffect(() => {
+    // This function runs whenever "storage" event fires (from Login.jsx)
     const handleStorageChange = () => {
       setToken(localStorage.getItem('access_token'))
+      setRole(localStorage.getItem('user_role')) // <--- Update Role too!
     }
 
-    // Listen to our custom event (and standard storage events)
     window.addEventListener('storage', handleStorageChange)
-
-    // Cleanup when component unmounts
     return () => window.removeEventListener('storage', handleStorageChange)
   }, [])
 
   const handleLogout = () => {
     localStorage.removeItem('access_token')
     localStorage.removeItem('user_role')
-    // Trigger the update immediately
-    window.dispatchEvent(new Event("storage"))
+    window.dispatchEvent(new Event("storage")) // Trigger the update
     navigate('/login')
   }
 
@@ -42,9 +40,9 @@ function Navbar() {
 
         {token ? (
           <>
-            {/* NEW: Instructor Link (Only visible if you are an Instructor) */}
-            {localStorage.getItem('user_role') === 'I' && (
-              <Link to="/instructor/create" style={{ color: '#FFD700', textDecoration: 'none', marginRight: '20px', fontWeight: 'bold' }}>
+            {/* STRICT CHECK: Only show if role is exactly 'I' */}
+            {role === 'I' && (
+              <Link to="/instructor/dashboard" style={{ color: '#FFD700', textDecoration: 'none', marginRight: '20px', fontWeight: 'bold' }}>
                 ⚡ Instructor Studio
               </Link>
             )}

@@ -559,3 +559,12 @@ class CourseCreateAPI(generics.CreateAPIView):
         
         # Auto-assign the creator as the instructor
         serializer.save(instructor=self.request.user)
+
+
+class TeacherCoursesListAPI(generics.ListAPIView):
+    serializer_class = CourseSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Filter courses where the instructor is the logged-in user
+        return Course.objects.filter(instructor=self.request.user)

@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path('', views.course_list, name='course_list'),
     # NEW ENROLL PATH
+    path('api/teacher-courses/', views.TeacherCoursesListAPI.as_view(), name='teacher_courses_api'),
     path('api/list/', views.CourseListAPI.as_view(), name='course_list_api'),
     path('api/<int:id>/', views.CourseDetailAPI.as_view(), name='course_detail_api'),
     path('api/my-courses/', views.MyCoursesListAPI.as_view(), name='my_courses_api'),

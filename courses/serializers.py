@@ -5,7 +5,8 @@ from .models import Course, Enrollment, Module, Lesson, LessonComplete # <--- En
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
-        fields = ['id', 'title', 'content_type', 'video_url', 'assessment_url', 'document']
+        # ADD 'module' to this list so we can link it!
+        fields = ['id', 'module', 'title', 'content_type', 'video_url', 'assessment_url', 'document']
 
 # 2. The Middle Layer (Includes Lessons)
 # ... inside courses/serializers.py ...

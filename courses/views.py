@@ -12,10 +12,12 @@ from xhtml2pdf import pisa
 
 # Add to Imports
 from rest_framework import generics, permissions, status
-from .serializers import CourseSerializer, CourseDetailSerializer, MyCourseSerializer, CourseCreateSerializer, ModuleSerializer, TeacherCourseSerializer # <--- Import it!
+from .serializers import CourseSerializer, CourseDetailSerializer, MyCourseSerializer, CourseCreateSerializer, ModuleSerializer, TeacherCourseSerializer, LessonSerializer # <--- Import it!
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import parsers # <--- Add this import at top if missing
+
 
 from django.template.loader import render_to_string
 from django.http import HttpResponse
@@ -598,3 +600,23 @@ class CreateModuleAPI(generics.CreateAPIView):
             raise PermissionDenied("You do not own this course.")
             
         serializer.save()
+
+
+class CreateLessonAPI(generics.CreateAPIView):
+    queryset = Lesson.objects.all()
+    serializer_class = LessonSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser] # Support file uploads
+
+    def perform_create(self, serializer):
+        # 1. Get the module ID from the form data
+        module_id = self.request.data.get('module')
+        module = get_object_or_404(Module, id=module_id)
+
+        # 2. Security: Does the user own the course this module belongs to?
+        if module.course.instructor != self.request.user:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You do not own this course.")
+
+        # 3. Save
+        serializer.save(module=module)

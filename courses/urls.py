@@ -18,6 +18,7 @@ urlpatterns = [
     path('api/modules/', views.CreateModuleAPI.as_view(), name='create_module_api'),
     path('api/teacher-courses/<int:pk>/', views.TeacherCourseDetailAPI.as_view(), name='teacher_course_detail_api'),
     path('api/modules/', views.CreateModuleAPI.as_view(), name='create_module_api'),
+    path('api/lessons/', views.CreateLessonAPI.as_view(), name='create_lesson_api'),
 
     # OLD ENROLL PATH
     path('create/', views.course_create, name='course_create'),

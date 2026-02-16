@@ -16,20 +16,20 @@ function Dashboard() {
     fetch('http://127.0.0.1:8000/api/test/', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
-    .then(res => res.json())
-    .then(data => setMessage(data.message))
+      .then(res => res.json())
+      .then(data => setMessage(data.message))
   }, [])
 
   return (
     <div>
-      <h1>Student Dashboard</h1>
+      <h1>Course Catalog</h1>
       <p>Welcome back! (Backend Status: {message})</p>
-      
+
       <hr style={{ margin: '30px 0' }} />
-      
+
       {/* <--- USE THE COMPONENT HERE */}
-      <CourseList /> 
-      
+      <CourseList />
+
     </div>
   )
 }

@@ -34,8 +34,10 @@ function InstructorCreate() {
       })
 
       if (response.ok) {
+        // ... inside if (response.ok) ...
+
         alert("Course Created Successfully!")
-        navigate('/') // Go back to Catalog
+        navigate('/instructor/dashboard') // <--- CHANGE THIS (Was '/')
       } else {
         const err = await response.json()
         alert("Error: " + JSON.stringify(err))

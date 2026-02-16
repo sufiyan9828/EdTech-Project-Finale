@@ -8,13 +8,14 @@ class LessonSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'content_type', 'video_url', 'assessment_url', 'document']
 
 # 2. The Middle Layer (Includes Lessons)
-# 2. The Middle Layer (Includes Lessons)
+# ... inside courses/serializers.py ...
+
 class ModuleSerializer(serializers.ModelSerializer):
-    lessons = LessonSerializer(many=True, read_only=True)
+    lessons = LessonSerializer(many=True, read_only=True) 
 
     class Meta:
         model = Module
-        # NEW: Added 'course' to this list so the backend accepts the ID
+        # CRITICAL FIX: Added 'course' here
         fields = ['id', 'course', 'title', 'description', 'lessons']
 
 # 3. The Top Layer (Includes Modules)
@@ -95,3 +96,17 @@ class CourseCreateSerializer(serializers.ModelSerializer):
         fields = ['title', 'description', 'category', 'price', 'image', 'start_date', 'end_date']
         # Note: We do NOT include 'instructor' here. 
         # The backend will automatically assign the logged-in user as the instructor.
+
+class TeacherCourseSerializer(serializers.ModelSerializer):
+    """
+    VIP Serializer for Instructors.
+    ALWAYS returns modules, even if not enrolled.
+    """
+    # FIX: Define the missing field
+    instructor_name = serializers.ReadOnlyField(source='instructor.username') 
+    
+    modules = ModuleSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Course
+        fields = ['id', 'title', 'description', 'category', 'price', 'image', 'instructor_name', 'modules']

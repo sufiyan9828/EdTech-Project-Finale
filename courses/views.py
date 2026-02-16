@@ -12,7 +12,7 @@ from xhtml2pdf import pisa
 
 # Add to Imports
 from rest_framework import generics, permissions, status
-from .serializers import CourseSerializer, CourseDetailSerializer, MyCourseSerializer, CourseCreateSerializer, ModuleSerializer # <--- Import it!
+from .serializers import CourseSerializer, CourseDetailSerializer, MyCourseSerializer, CourseCreateSerializer, ModuleSerializer, TeacherCourseSerializer # <--- Import it!
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -570,11 +570,14 @@ class TeacherCoursesListAPI(generics.ListAPIView):
         # Filter courses where the instructor is the logged-in user
         return Course.objects.filter(instructor=self.request.user)
 
+# ... inside courses/views.py ...
+
 class TeacherCourseDetailAPI(generics.RetrieveAPIView):
     """
     Allows the Instructor to see their OWN course details.
     """
-    serializer_class = CourseSerializer
+    # USE THE VIP SERIALIZER
+    serializer_class = TeacherCourseSerializer 
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -586,7 +589,7 @@ class CreateModuleAPI(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        # Now that we fixed the Serializer, this line will work:
+        # This line will ONLY work if you applied Fix 1 (Serializer)
         course = serializer.validated_data['course']
         
         # Security Check: Do you own this course?

@@ -27,6 +27,7 @@ ALLOWED_HOSTS = ["*"]
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
 
 INSTALLED_APPS = [
@@ -36,11 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Third-party apps
-    'rest_framework',  # NEW
-    'corsheaders',     # NEW
-    'rest_framework.authtoken', #NEW
-    'djoser',          #NEW
+    # Third Party
+    'rest_framework',           # <--- RESTORED
+    'corsheaders',              # <--- RESTORED
+    'djoser',                   # <--- RESTORED
+    'rest_framework_simplejwt', # <--- RESTORED
     # Local apps
     'accounts',
     'courses',
@@ -131,8 +132,9 @@ REST_FRAMEWORK = {
 
 # JWT Configuration (Optional: Customizing token lifetime)
 from datetime import timedelta
+# 3. JWT SETTINGS
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }

@@ -5,6 +5,8 @@ import Dashboard from './pages/Dashboard'
 import CourseDetail from './pages/CourseDetail' // <--- IMPORT THIS
 import MyCourses from './pages/MyCourses' // <--- Import
 import Profile from './pages/Profile'
+import InstructorRoute from './components/InstructorRoute'
+import InstructorCreate from './pages/InstructorCreate'
 
 function App() {
   return (
@@ -20,6 +22,10 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/my-courses" element={<MyCourses />} />
+
+          <Route element={<InstructorRoute />}>
+            <Route path="/instructor/create" element={<InstructorCreate />} />
+          </Route>
 
         </Routes>
       </div>

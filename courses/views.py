@@ -12,7 +12,7 @@ from xhtml2pdf import pisa
 
 # Add to Imports
 from rest_framework import generics, permissions, status
-from .serializers import CourseSerializer, CourseDetailSerializer, MyCourseSerializer # <--- Import it!
+from .serializers import CourseSerializer, CourseDetailSerializer, MyCourseSerializer, CourseCreateSerializer # <--- Import it!
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -541,3 +541,21 @@ class MyAchievementsAPI(APIView):
             })
         
         return Response(data)
+    
+
+class CourseCreateAPI(generics.CreateAPIView):
+    """
+    Allows Instructors to create a new course.
+    """
+    serializer_class = CourseCreateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        # Security Check: Is this user actually an Instructor?
+        # Assuming your User model has user_type='I' for Instructors
+        if self.request.user.user_type != 'I': 
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Only instructors can create courses.")
+        
+        # Auto-assign the creator as the instructor
+        serializer.save(instructor=self.request.user)

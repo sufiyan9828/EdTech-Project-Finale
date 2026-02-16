@@ -12,6 +12,7 @@ urlpatterns = [
     path('api/lesson/<int:lesson_id>/toggle-complete/', views.ToggleLessonCompletionAPI.as_view(), name='toggle_lesson_complete_api'),
     path('api/course/<int:course_id>/certificate/', views.CertificateAPI.as_view(), name='course_certificate_api'),
     path('api/my-achievements/', views.MyAchievementsAPI.as_view(), name='my_achievements_api'),
+    path('api/create-course/', views.CourseCreateAPI.as_view(), name='course_create_api'),
 
     # OLD ENROLL PATH
     path('create/', views.course_create, name='course_create'),

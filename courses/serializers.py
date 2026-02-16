@@ -86,3 +86,10 @@ class MyCourseSerializer(serializers.ModelSerializer):
         
         # 4. Calculate Percentage
         return int((completed_lessons / total_lessons) * 100)
+
+class CourseCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = ['title', 'description', 'category', 'price', 'image', 'start_date', 'end_date']
+        # Note: We do NOT include 'instructor' here. 
+        # The backend will automatically assign the logged-in user as the instructor.

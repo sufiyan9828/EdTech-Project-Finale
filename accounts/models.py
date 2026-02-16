@@ -8,23 +8,32 @@ def get_profile_photo_path(instance, filename):
 
 
 class User(AbstractUser):
+    # ... keep existing fields ...
     name = models.CharField(max_length=70, default='name')
     contact = models.CharField(max_length=13)
-    # NEW PROFILE FIELDS
+    user_type = models.CharField(
+        max_length=1,
+        choices=(('I', "Instructor"), ('S', "Student")),
+        default='S' # Added default
+    )
+    
+    # --- RESTORED FIELDS ---
     bio = models.TextField(blank=True, null=True)
+    # We can reuse the profile_photo logic you have, or add a simple field. 
+    # Let's add a simple one for the React profile to work easily:
     profile_image = models.ImageField(upload_to='profile_photos/', blank=True, null=True)
     
-    # Social Links
     git_link = models.URLField(blank=True, null=True)
     x_link = models.URLField(blank=True, null=True)
     instagram_link = models.URLField(blank=True, null=True)
-    user_type = models.CharField(
-        max_length=1,
-        choices=(
-            ('I', "Instructor"),
-            ('S', "Student"),
-        ),
-    )
+
+    # ... keep your get_profile_photo_url method if you want ...    # user_type = models.CharField(
+    #     max_length=1,
+    #     choices=(
+    #         ('I', "Instructor"),
+    #         ('S', "Student"),
+    #     ),
+    # )
 
     def get_profile_photo_url(self):
         if (

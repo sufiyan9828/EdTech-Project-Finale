@@ -620,3 +620,20 @@ class CreateLessonAPI(generics.CreateAPIView):
 
         # 3. Save
         serializer.save(module=module)
+
+
+class DeleteModuleAPI(generics.DestroyAPIView):
+    serializer_class = ModuleSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Safety: Only find modules that belong to the logged-in Instructor
+        return Module.objects.filter(course__instructor=self.request.user)
+
+class DeleteLessonAPI(generics.DestroyAPIView):
+    serializer_class = LessonSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Safety: Only find lessons inside courses owned by the Instructor
+        return Lesson.objects.filter(module__course__instructor=self.request.user)

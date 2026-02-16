@@ -75,6 +75,30 @@ function InstructorCourseEdit() {
     }
   }
 
+  // ... inside InstructorCourseEdit function ...
+
+  const handleDeleteModule = async (moduleId) => {
+    if (!confirm("Are you sure? This will delete all lessons in this module.")) return
+
+    const token = localStorage.getItem('access_token')
+    await fetch(`http://127.0.0.1:8000/courses/api/modules/${moduleId}/`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    fetchCourse() // Refresh UI
+  }
+
+  const handleDeleteLesson = async (lessonId) => {
+    if (!confirm("Delete this lesson?")) return
+
+    const token = localStorage.getItem('access_token')
+    await fetch(`http://127.0.0.1:8000/courses/api/lessons/${lessonId}/`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    fetchCourse() // Refresh UI
+  }
+
   if (!course) return <div style={{ padding: '20px' }}>Loading Studio...</div>
 
   return (
@@ -94,7 +118,14 @@ function InstructorCourseEdit() {
           {course.modules && course.modules.map(module => (
             <div key={module.id} style={{ background: '#f9f9f9', border: '1px solid #ddd', borderRadius: '8px', padding: '20px', marginBottom: '20px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <h3 style={{ margin: 0 }}>{module.title}</h3>
+                {/* OLD: */}
+                {/* <h3 style={{ margin: 0 }}>{module.title}</h3> */}
+
+                {/* NEW: */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                  <h3 style={{ margin: 0 }}>{module.title}</h3>
+                  <button onClick={() => handleDeleteModule(module.id)} style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}>🗑️</button>
+                </div>
                 <button onClick={() => setActiveModuleId(activeModuleId === module.id ? null : module.id)} style={{ cursor: 'pointer', background: 'none', border: 'none', color: '#007bff' }}>
                   {activeModuleId === module.id ? 'Cancel' : '+ Add Lesson'}
                 </button>
@@ -104,7 +135,18 @@ function InstructorCourseEdit() {
               <div style={{ marginLeft: '20px', borderLeft: '2px solid #ddd', paddingLeft: '15px' }}>
                 {module.lessons && module.lessons.map(lesson => (
                   <div key={lesson.id} style={{ padding: '5px 0', color: '#555' }}>
-                    {lesson.content_type === 'V' ? '🎥' : '📄'} {lesson.title}
+                    {/* OLD: */}
+                    {/* {lesson.content_type === 'V' ? '🎥' : '📄'} {lesson.title} */}
+
+                    {/* NEW: */}
+                    <div key={lesson.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid #eee' }}>
+                      <span style={{ color: '#555' }}>
+                        {lesson.content_type === 'V' ? '🎥' : '📄'} {lesson.title}
+                      </span>
+                      <button onClick={() => handleDeleteLesson(lesson.id)} style={{ color: '#ff6b6b', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8em' }}>
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 ))}
                 {(!module.lessons || module.lessons.length === 0) && <div style={{ fontStyle: 'italic', color: '#999' }}>Empty module</div>}

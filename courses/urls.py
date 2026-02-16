@@ -14,6 +14,8 @@ urlpatterns = [
     path('api/course/<int:course_id>/certificate/', views.CertificateAPI.as_view(), name='course_certificate_api'),
     path('api/my-achievements/', views.MyAchievementsAPI.as_view(), name='my_achievements_api'),
     path('api/create-course/', views.CourseCreateAPI.as_view(), name='course_create_api'),
+    path('api/teacher-courses/<int:pk>/', views.TeacherCourseDetailAPI.as_view(), name='teacher_course_detail_api'),
+    path('api/modules/', views.CreateModuleAPI.as_view(), name='create_module_api'),
 
     # OLD ENROLL PATH
     path('create/', views.course_create, name='course_create'),

@@ -8,6 +8,7 @@ import Profile from './pages/Profile'
 import InstructorRoute from './components/InstructorRoute'
 import InstructorCreate from './pages/InstructorCreate'
 import InstructorDashboard from './pages/InstructorDashboard'
+import InstructorCourseEdit from './pages/InstructorCourseEdit'
 
 function App() {
   return (
@@ -23,12 +24,10 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/my-courses" element={<MyCourses />} />
-
-
-
-          <Route path="/instructor/dashboard" element={<InstructorDashboard />} />
           <Route element={<InstructorRoute />}>
             <Route path="/instructor/create" element={<InstructorCreate />} />
+            <Route path="/instructor/dashboard" element={<InstructorDashboard />} />
+            <Route path="/instructor/course/:id" element={<InstructorCourseEdit />} />
           </Route>
 
         </Routes>

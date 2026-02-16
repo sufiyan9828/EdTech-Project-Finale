@@ -8,12 +8,14 @@ class LessonSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'content_type', 'video_url', 'assessment_url', 'document']
 
 # 2. The Middle Layer (Includes Lessons)
+# 2. The Middle Layer (Includes Lessons)
 class ModuleSerializer(serializers.ModelSerializer):
-    lessons = LessonSerializer(many=True, read_only=True) # Nested magic
+    lessons = LessonSerializer(many=True, read_only=True)
 
     class Meta:
         model = Module
-        fields = ['id', 'title', 'description', 'lessons']
+        # NEW: Added 'course' to this list so the backend accepts the ID
+        fields = ['id', 'course', 'title', 'description', 'lessons']
 
 # 3. The Top Layer (Includes Modules)
 class CourseDetailSerializer(serializers.ModelSerializer):

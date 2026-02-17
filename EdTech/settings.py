@@ -130,6 +130,19 @@ REST_FRAMEWORK = {
     ],
 }
 
+# ... inside settings.py ...
+
+DJOSER = {
+    'LOGIN_FIELD': 'username', # Or 'email' if you prefer email login
+    'SERIALIZERS': {
+        'user_create': 'accounts.serializers.UserCreateSerializer', # <--- Points to your new class
+        'current_user': 'accounts.serializers.UserProfileSerializer',
+    },
+    # Optional: If you want to disable account activation emails for now (simpler dev flow)
+    'SEND_ACTIVATION_EMAIL': False,
+    'SEND_CONFIRMATION_EMAIL': False,
+}
+
 # JWT Configuration (Optional: Customizing token lifetime)
 from datetime import timedelta
 # 3. JWT SETTINGS

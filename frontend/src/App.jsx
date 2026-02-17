@@ -1,38 +1,41 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
-import CourseDetail from './pages/CourseDetail' // <--- IMPORT THIS
-import MyCourses from './pages/MyCourses' // <--- Import
+import CourseDetail from './pages/CourseDetail'
+import MyCourses from './pages/MyCourses'
 import Profile from './pages/Profile'
 import InstructorRoute from './components/InstructorRoute'
-import InstructorCreate from './pages/InstructorCreate'
 import InstructorDashboard from './pages/InstructorDashboard'
+import InstructorCreate from './pages/InstructorCreate'
 import InstructorCourseEdit from './pages/InstructorCourseEdit'
+
+// IMPORT THE NEW PAGE (Ensure you created this file!)
+import Register from './pages/Register' // <--- 1. ADD THIS IMPORT
 
 function App() {
   return (
-    <BrowserRouter>
+    <>
       <Navbar />
-      <div style={{ padding: '20px' }}>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/login" element={<Login />} />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} /> {/* <--- 2. ADD THIS ROUTE */}
+        <Route path="/course/:id" element={<CourseDetail />} />
 
-          {/* NEW DYNAMIC ROUTE */}
-          {/* :id is a variable placeholder */}
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/course/:id" element={<CourseDetail />} />
-          <Route path="/my-courses" element={<MyCourses />} />
-          <Route element={<InstructorRoute />}>
-            <Route path="/instructor/create" element={<InstructorCreate />} />
-            <Route path="/instructor/dashboard" element={<InstructorDashboard />} />
-            <Route path="/instructor/course/:id" element={<InstructorCourseEdit />} />
-          </Route>
+        {/* Student Routes */}
+        <Route path="/my-courses" element={<MyCourses />} />
+        <Route path="/profile" element={<Profile />} />
 
-        </Routes>
-      </div>
-    </BrowserRouter>
+        {/* Instructor Routes */}
+        <Route element={<InstructorRoute />}>
+          <Route path="/instructor/dashboard" element={<InstructorDashboard />} />
+          <Route path="/instructor/create" element={<InstructorCreate />} />
+          <Route path="/instructor/course/:id" element={<InstructorCourseEdit />} />
+        </Route>
+      </Routes>
+    </>
   )
 }
 

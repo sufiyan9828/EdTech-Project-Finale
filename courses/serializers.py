@@ -1,6 +1,17 @@
 from rest_framework import serializers
 from .models import Course, Enrollment, Module, Lesson, LessonComplete # <--- Ensure imports
 
+from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class UserCreateSerializer(BaseUserCreateSerializer):
+    class Meta(BaseUserCreateSerializer.Meta):
+        model = User
+        # We add 'user_type' so users can choose to be a Student or Instructor
+        fields = ('id', 'email', 'username', 'password', 'user_type')
+
 # 1. The Bottom Layer
 # In courses/serializers.py
 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom' // <--- 1. Import this
+import { useNavigate, Link } from 'react-router-dom' // <--- 1. Import this
 
 function Login() {
   const [username, setUsername] = useState('')
@@ -83,6 +83,13 @@ function Login() {
           Log In
         </button>
       </form>
+      {/* // ... inside the return div, at the bottom ... */}
+      <div style={{ textAlign: 'center', marginTop: '20px' }}>
+        <p>Don't have an account?</p>
+        <Link to="/register" style={{ color: '#007bff', textDecoration: 'none', fontWeight: 'bold' }}>
+          Create New Account
+        </Link>
+      </div>
     </div>
   )
 }

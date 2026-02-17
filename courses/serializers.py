@@ -48,10 +48,17 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 # 4. The List Layer (Lightweight - No Modules)
 class CourseSerializer(serializers.ModelSerializer):
     instructor_name = serializers.ReadOnlyField(source='instructor.username')
+    students_count = serializers.SerializerMethodField() # <--- NEW FIELD
 
     class Meta:
         model = Course
-        fields = ['id', 'title', 'description', 'category', 'price', 'image', 'instructor_name']
+        # Add 'students_count' to the list
+        fields = ['id', 'title', 'description', 'category', 'price', 'image', 'instructor_name', 'students_count']
+
+    def get_students_count(self, obj):
+        # Count only valid enrollments (where status is 'enrolled' or just existence depending on your logic)
+        # Using the reverse relationship name 'enrollments' from your models
+        return obj.enrollments.count()
 
 class EnrollmentSerializer(serializers.ModelSerializer):
     class Meta:

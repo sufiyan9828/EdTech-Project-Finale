@@ -61,11 +61,14 @@ class Lesson(models.Model):
     module = models.ForeignKey(Module,on_delete=models.CASCADE, related_name="lessons")
     title = models.CharField(max_length=200)
     content = models.TextField(blank=True,null=True)
-    content_type = models.CharField(max_length=20,choices=CONTENT_CHOICES)
-
-    assessment_url = models.URLField(blank=True,null=True)
-    video_url = models.URLField(blank=True,null=True)
-    document = models.FileField(upload_to="lesson_documents/",blank=True,null=True)        
+    content_type = models.CharField(max_length=1, choices=CONTENT_CHOICES)
+    
+    # UPDATE THESE FIELDS:
+    video_url = models.URLField(blank=True, null=True, help_text="YouTube/Video Link")
+    video_file = models.FileField(upload_to='course_videos/', blank=True, null=True, help_text="Upload Video File")
+    
+    assessment_url = models.URLField(blank=True, null=True)
+    document = models.FileField(upload_to='lesson_documents/', blank=True, null=True) 
 
     def __str__(self):
         return f"{self.module.title} - {self.title}"

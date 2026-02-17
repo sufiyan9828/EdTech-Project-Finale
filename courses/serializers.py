@@ -2,11 +2,13 @@ from rest_framework import serializers
 from .models import Course, Enrollment, Module, Lesson, LessonComplete # <--- Ensure imports
 
 # 1. The Bottom Layer
+# In courses/serializers.py
+
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
-        # ADD 'module' to this list so we can link it!
-        fields = ['id', 'module', 'title', 'content_type', 'video_url', 'assessment_url', 'document']
+        # Add 'video_file' to this list
+        fields = ['id', 'module', 'title', 'content_type', 'video_url', 'video_file', 'assessment_url', 'document']
 
 # 2. The Middle Layer (Includes Lessons)
 # ... inside courses/serializers.py ...

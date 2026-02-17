@@ -48,25 +48,31 @@ function InstructorCourseEdit() {
     formData.append('title', lessonData.title)
     formData.append('content_type', lessonData.content_type)
 
-    // Handle File based on type
-    if (lessonFile) {
-      if (lessonData.content_type === 'V') {
-        formData.append('video_url', lessonFile) // Assuming model field is video_url
-      } else {
+    // SMART HANDLING: Check what kind of data we have
+    if (lessonData.content_type === 'V') {
+      if (lessonFile) {
+        // Priority 1: File Upload
+        formData.append('video_file', lessonFile)
+      } else if (lessonData.video_url) {
+        // Priority 2: URL Link
+        formData.append('video_url', lessonData.video_url)
+      }
+    } else if (lessonData.content_type === 'D') {
+      if (lessonFile) {
         formData.append('document', lessonFile)
       }
     }
 
     const res = await fetch('http://127.0.0.1:8000/courses/api/lessons/', {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` }, // No Content-Type for FormData
+      headers: { 'Authorization': `Bearer ${token}` },
       body: formData
     })
 
     if (res.ok) {
       alert("Lesson Added!")
-      setActiveModuleId(null) // Close the form
-      setLessonData({ title: '', content_type: 'V' })
+      setActiveModuleId(null)
+      setLessonData({ title: '', content_type: 'V', video_url: '' }) // Reset
       setLessonFile(null)
       fetchCourse()
     } else {
@@ -162,20 +168,48 @@ function InstructorCourseEdit() {
                     style={{ display: 'block', width: '100%', padding: '8px', marginBottom: '10px' }}
                     required
                   />
+                  {/* Inside the Add Lesson Form */}
                   <select
                     value={lessonData.content_type}
                     onChange={e => setLessonData({ ...lessonData, content_type: e.target.value })}
                     style={{ display: 'block', width: '100%', padding: '8px', marginBottom: '10px' }}
                   >
-                    <option value="V">Video (Upload)</option>
-                    <option value="D">Document (PDF)</option>
+                    <option value="V">Video Lesson</option>
+                    <option value="D">Document / PDF</option>
                   </select>
-                  <input
-                    type="file"
-                    onChange={e => setLessonFile(e.target.files[0])}
-                    style={{ display: 'block', marginBottom: '10px' }}
-                    required
-                  />
+
+                  {/* DYNAMIC INPUTS BASED ON TYPE */}
+                  {lessonData.content_type === 'V' && (
+                    <div style={{ marginBottom: '10px' }}>
+                      <p style={{ margin: '5px 0', fontSize: '0.9em', color: '#666' }}>Option 1: Upload File</p>
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={e => setLessonFile(e.target.files[0])}
+                        style={{ display: 'block', marginBottom: '10px' }}
+                      />
+                      <p style={{ margin: '5px 0', fontSize: '0.9em', color: '#666' }}>Option 2: OR Enter URL (YouTube/Vimeo)</p>
+                      <input
+                        placeholder="https://youtube.com/..."
+                        value={lessonData.video_url || ''}
+                        onChange={e => setLessonData({ ...lessonData, video_url: e.target.value })}
+                        style={{ display: 'block', width: '100%', padding: '8px' }}
+                      />
+                    </div>
+                  )}
+
+                  {lessonData.content_type === 'D' && (
+                    <div style={{ marginBottom: '10px' }}>
+                      <label>Upload PDF/Document:</label>
+                      <input
+                        type="file"
+                        accept=".pdf,.docx,.txt"
+                        onChange={e => setLessonFile(e.target.files[0])}
+                        style={{ display: 'block', marginTop: '5px' }}
+                      />
+                    </div>
+                  )}
+
                   <button type="submit" style={{ background: '#28a745', color: 'white', border: 'none', padding: '8px 15px', borderRadius: '4px', cursor: 'pointer' }}>
                     Upload Lesson
                   </button>

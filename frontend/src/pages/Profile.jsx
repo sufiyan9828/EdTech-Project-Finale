@@ -78,7 +78,8 @@ function Profile() {
   if (!profile) return <div style={{ padding: '20px' }}>Loading Profile...</div>
 
   return (
-    <div style={{ padding: '40px', maxWidth: '1000px', margin: '0 auto', display: 'flex', gap: '40px' }}>
+    // Change maxWidth from '1000px' to '1400px' or '90%'
+    <div style={{ padding: '40px', maxWidth: '1400px', margin: '0 auto', display: 'flex', gap: '40px' }}>
 
       {/* LEFT COLUMN: Identity */}
       <div style={{ flex: 1, border: '1px solid #ddd', borderRadius: '10px', padding: '30px', textAlign: 'center', height: 'fit-content' }}>

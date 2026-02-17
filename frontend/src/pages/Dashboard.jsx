@@ -21,7 +21,8 @@ function Dashboard() {
   }, [])
 
   return (
-    <div>
+    // Change maxWidth to '1400px'
+    <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
       <h1>Course Catalog</h1>
       <p>Welcome back! (Backend Status: {message})</p>
 
